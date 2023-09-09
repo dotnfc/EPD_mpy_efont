@@ -77,3 +77,83 @@ storing the address of local variable 'buffer' in '*worker.cell_null' [-Wdanglin
 1971 |     ras.cell_null        = buffer + FT_MAX_GRAY_POOL - 1;
 ```
 
+## 3. 开发中的提示
+
+1. 建议用 ccproxy 的 socks5 二级代理模式
+    ```shell
+    export http_proxy="socks5://$host_ip:3128"
+    export https_proxy="socks5://$host_ip:3128"
+    unset http_proxy
+    unset https_proxy
+    ```
+2. 关闭文件监控
+    ```ps
+    Set-MpPreference -DisableRealtimeMonitoring $true
+    ```
+
+3. 查看 micropython 已加载的模块
+    ```python
+    help('modules')
+    ```
+
+4. 掐 mpy 执行时间和 ram
+    ```python
+    >>> import time
+    >>> import gc
+    >>>
+    >>> mem_free = gc.mem_free()
+    >>> _start = timer.ticks_ms()
+    >>> import font24
+    >>> _stop = timer.ticks_ms() # module has loaded
+    >>> print(mem_free - gc.mem_free())
+    36656
+    >>> print(_stop - _start)   # in ms
+    1666.031
+    ```
+5. 模块的安装
+[micropython-lib](https://github.com/micropython/micropython-lib)
+    ```python
+    $ ./build-standard/micropython -m mip install hmac
+    or
+    $ ./build-standard/micropython
+    >>> import mip
+    >>> mip.install("hmac")
+    ```
+
+    > 在 esp32 上，可以开 wifi 联网后，下载到文件系统中：
+
+    ```python
+    import network
+
+    ssid_ = [ROUTER_SSID]
+    wp2_pass = [ROUTER_WPA2_PASSWORD]
+
+    sta_if = network.WLAN(network.STA_IF)
+    sta_if.active(True)
+    sta_if.connect(ssid_, wp2_pass)
+
+    while not sta_if.isconnected():
+        pass
+
+    print('network config:', sta_if.ifconfig())
+
+    # upip replaced by mip since 1.19
+    import mip
+    mip.install('hmac')
+    ```
+
+    > 查询 micropython 平台的 模块 https://pypi.org/search/?q=micropython-* 
+
+6. 使用 psram
+    ```python
+    >>> import micropython
+    >>> micropython.mem_info()
+    stack: 704 out of 15360
+    GC: total: 128000, used: 68160, free: 59840, max new split: 1933312
+    No. of 1-blocks: 29, 2-blocks: 14, max blk sz: 2048, max free sz: 1952
+    >>> arr32k = bytearray(32 * 1024)
+    ```
+
+<hr>
+
+*.nfc 2023/09/09*

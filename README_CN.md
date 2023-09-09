@@ -20,7 +20,7 @@ efont 采用了 FreeType2，所以可以支持：
 
 ### 3.1 ttf 转小字库
 使用 python fonttools 的 [pyftsubset 工具](https://fonttools.readthedocs.io/en/latest/subset/index.html)
-```
+```shell
 pyftsubset fonts\SimYou3D.ttf --text-file=chardict.txt  --output-file=simyou-lite.ttf
 ```
 
@@ -37,20 +37,44 @@ examples/font/ 已携带两款开源的文泉驿点阵字体。
 
 其中 -s 后面的参数最好与 partiton 中 vfs 分区的大小一致; PIO_Core 为 PlatformIO 的安装目录，通常是 %userprofile%\\.platformio\
 
-```
+```ps
 > {PIO_Core}\packages\tool-mkfatfs\mkfatfs -c ./examples -t fatfs -s 4194304 efore_s3_vfs.bin 
 ```
 
 ### 4.2 写入镜像
-```
+```ps
 > esptool  --before default_reset --after hard_reset --chip esp32s3 --baud 921600 --port com6 write_flash -z 0x290000 efore_s3_vfs.bin
 ```
 
 ### 4.3 测试 vfs 文件系统
-```
+```python
 >>> import os
 >>> os.listdir()
 ```
+
+## 5. 编译 efont
+请参考 [build_CN.md](docs/build_CN.md)
+
+## 6. 如何运行脚本
+请参考 [脚本的运行](https://docs.micropython.org/en/latest/pyboard/tutorial/script.html)。 目标板上的 main.py 是一个入口脚本，启动后就直接运行。除非我们要求目标板进入了 repl 模式。
+
+在 PC 端，我们可以用 mpremote, rshell 等工具，运行交互式终端，运行脚本，管理 vfs 文件和目录等。
+
+对于脚本开发，[RT-Thread Micropython IDE for VSCode](https://marketplace.visualstudio.com/items?itemName=RT-Thread.rt-thread-micropython) 不错。
+
+<hr>
+
+## <span style="color:red;">注意</span>
+mpy 的 esp32 port 需要做一个 [patch](tools/esp32-patch.diff)
+
+- 为调试 ESP32-S3，需要将 JTAG 优先
+- 当前 FT2 中间层的实现需要需要较大的栈空间，所以需要调整 ESP32 的 MP_TASK_STACK_SIZE 大小，micropython/ports/esp32/main.c
+
+```c
+#define MP_TASK_STACK_SIZE      (32 * 1024)
+```
+
+<hr>
 
 ## 参考
 - https://github.com/takkaO/OpenFontRender [FT2 封装接口]
