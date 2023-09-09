@@ -10,7 +10,7 @@
 - [examples/](examples/) -- 实例代码，以及 efont 模块的代码补全脚本
 - [micropython/](micropython/) -- microropython 官方源码
 - [mod_efont/](mod_efont/) -- 模块实现
-- [script/](script/) -- 工具脚本
+- [tools/](tools/) -- 工具脚本
 
 ## 2. 模块的 API
 > [docs/api.md](docs/api.md) 

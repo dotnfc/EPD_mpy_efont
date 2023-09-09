@@ -10,7 +10,7 @@ This module provides TTF, PCF bitmap font support, as well as JPG and PNG image 
 - [examples/](examples/) -- Example code and code completion script for the eFont module
 - [micropython/](micropython/) -- MicroPython official source code (git submodule)
 - [mod_efont/](mod_efont/) -- Module implementation
-- [script/](script/) -- Utility scripts
+- [tools/](tools/) -- Utility scripts
 
 ## 2. Module API
 > [docs/api.md](docs/api.md)
