@@ -23,10 +23,10 @@ $ make USER_C_MODULES=../../../mod_efont/  DEBUG=1 -j4 CWARN="-Wno-error=unused-
 
 ### 2.1 ESP-IDF 的安装
 
-首先下载 ESP-IDF,有三种渠道，(目前建议使用 5.0.2)
-- [ESP-IDF Installer](https://dl.espressif.cn/dl/esp-idf/)
+首先下载 ESP-IDF,有三种渠道，(目前 2023/09/09 请使用 5.0.2)
+- [ESP-IDF Installer](https://dl.espressif.cn/dl/esp-idf/)  best for windows
 - [espressif Github](https://github.com/espressif/esp-idf/releases/tag/v5.0.2)
-- [espressif Support](https://dl.espressif.com/github_assets/espressif/esp-idf/releases/download/v5.0/esp-idf-v5.0.zip) | [Site](https://www.espressif.com/en/support/download/sdks-demos)
+- [espressif Support](https://dl.espressif.com/github_assets/espressif/esp-idf/releases/download/v5.0.2/esp-idf-v5.0.2.zip) | [Site](https://www.espressif.com/en/support/download/sdks-demos)
 
 然后就是安装工具链，推荐乐鑫国内镜像网站：
 ```shell
@@ -35,6 +35,23 @@ $ make USER_C_MODULES=../../../mod_efont/  DEBUG=1 -j4 CWARN="-Wno-error=unused-
 $ export IDF_GITHUB_ASSETS="dl.espressif.com/github_assets" 
 $ ./install.sh  esp32s3
 $ . ./export.sh
+```
+
+如果 安装 python 虚拟环境的时候，很慢，那就开启 pip 全局国内镜像
+```shell
+$ mkdir ~/pip
+$ vi ~/pip/pip.conf
+```
+
+新增其内容为:
+```ini
+[global]
+index-url=https://pypi.tuna.tsinghua.edu.cn/simple
+timeout = 6000
+ 
+[install]
+trusted-host=pypi.tuna.tsinghua.edu.cn
+disable-pip-version-check = true
 ```
 
 ### 2.2 EFORE_S3 编译
@@ -59,7 +76,7 @@ $ cp -f build-EFORE_S3/firmware.bin /mnt/d/mpy-efore-s3.bin
 
 ### 注意 !
 
-对于 gcc-v12 (esp-idf-v5.1) 修改 {micropython}\ports\esp32\esp32_common.cmake
+对于 gcc-v12 (esp-idf-v5.1 目前不建议用 2023/09/09) 修改 {micropython}\ports\esp32\esp32_common.cmake
 
 ```cmake
 # Disable some warnings to keep the build output clean.
@@ -81,6 +98,7 @@ storing the address of local variable 'buffer' in '*worker.cell_null' [-Wdanglin
 
 1. 建议用 ccproxy 的 socks5 二级代理模式
     ```shell
+    host_ip=$(cat /etc/resolv.conf |grep "nameserver" |cut -f 2 -d " ")
     export http_proxy="socks5://$host_ip:3128"
     export https_proxy="socks5://$host_ip:3128"
     unset http_proxy
