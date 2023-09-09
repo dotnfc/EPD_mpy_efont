@@ -1,0 +1,47 @@
+diff --git a/ports/esp32/main.c b/ports/esp32/main.c
+index a6346b027..0447127c5 100644
+--- a/ports/esp32/main.c
++++ b/ports/esp32/main.c
+@@ -66,7 +66,7 @@
+ 
+ // MicroPython runs as a task under FreeRTOS
+ #define MP_TASK_PRIORITY        (ESP_TASK_PRIO_MIN + 1)
+-#define MP_TASK_STACK_SIZE      (16 * 1024)
++#define MP_TASK_STACK_SIZE      (32 * 1024)
+ 
+ // Set the margin for detecting stack overflow, depending on the CPU architecture.
+ #if CONFIG_IDF_TARGET_ESP32C3
+@@ -89,10 +89,10 @@ void mp_task(void *pvParameter) {
+     #if MICROPY_PY_THREAD
+     mp_thread_init(pxTaskGetStackStart(NULL), MP_TASK_STACK_SIZE / sizeof(uintptr_t));
+     #endif
+-    #if CONFIG_USB_OTG_SUPPORTED
+-    usb_init();
+-    #elif CONFIG_ESP_CONSOLE_USB_SERIAL_JTAG
+-    usb_serial_jtag_init();
++    #if CONFIG_ESP_CONSOLE_USB_SERIAL_JTAG
++      usb_serial_jtag_init();
++    #elif CONFIG_USB_OTG_SUPPORTED
++      usb_init();
+     #endif
+     #if MICROPY_HW_ENABLE_UART_REPL
+     uart_stdout_init();
+diff --git a/ports/esp32/mphalport.c b/ports/esp32/mphalport.c
+index 63a674c24..d5857a0e9 100644
+--- a/ports/esp32/mphalport.c
++++ b/ports/esp32/mphalport.c
+@@ -111,10 +111,10 @@ void mp_hal_stdout_tx_strn(const char *str, size_t len) {
+     if (release_gil) {
+         MP_THREAD_GIL_EXIT();
+     }
+-    #if CONFIG_USB_OTG_SUPPORTED
+-    usb_tx_strn(str, len);
+-    #elif CONFIG_ESP_CONSOLE_USB_SERIAL_JTAG
+-    usb_serial_jtag_tx_strn(str, len);
++    #if CONFIG_ESP_CONSOLE_USB_SERIAL_JTAG
++      usb_serial_jtag_tx_strn(str, len);
++    #elif CONFIG_USB_OTG_SUPPORTED
++      usb_tx_strn(str, len);
+     #endif
+     #if MICROPY_HW_ENABLE_UART_REPL
+     uart_stdout_tx_strn(str, len);
