@@ -67,11 +67,10 @@ examples/font/ 已携带两款开源的文泉驿点阵字体。
 ## <span style="color:red;">注意</span>
 mpy 的 esp32 port 需要做一个 [patch](tools/esp32-patch.diff)
 
-- 为调试 ESP32-S3，需要将 JTAG 优先
 - 当前 FT2 中间层的实现需要需要较大的栈空间，所以需要调整 ESP32 的 MP_TASK_STACK_SIZE 大小，micropython/ports/esp32/main.c
 
 ```c
-#define MP_TASK_STACK_SIZE      (32 * 1024)
+#define MP_TASK_STACK_SIZE      (24 * 1024)
 ```
 
 <hr>

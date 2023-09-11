@@ -20,12 +20,12 @@ public:
         delete[] data_;
     }
 
-    void Append(uint16_t element)
+    void Append(wchar_t element)
     {
         if (size_ == capacity_)
         {
             capacity_ += 128;
-            uint16_t *new_data = new uint16_t[capacity_];
+            wchar_t *new_data = new wchar_t[capacity_];
             for (size_t i = 0; i < size_; i++)
             {
                 new_data[i] = data_[i];
@@ -52,7 +52,7 @@ public:
         }
         else
         {
-            exit(EXIT_FAILURE);
+            return 0;   // should never reach here or raise an exception
         }
     }
 
@@ -62,7 +62,7 @@ public:
     }
 
 private:
-    uint16_t *data_;
+    wchar_t *data_;
     size_t size_;
     size_t capacity_;
 };

@@ -63,12 +63,11 @@ Please refer to [build.md](docs/build.md)
 ## <span style="color:red;">NOTE</span>
 the ESP32 port of MicroPython (mpy) requires applying a [patch](tools/esp32-patch.diff)
 
-- To debug ESP32-S3, it's necessary to prioritize JTAG.
 - The current FT2 middleware implementation requires a larger stack space, so you need to adjust the size of ESP32's MP_TASK_STACK_SIZE in
 micropython/ports/esp32/main.c
 
 ```c
-#define MP_TASK_STACK_SIZE      (32 * 1024)
+#define MP_TASK_STACK_SIZE      (24 * 1024)
 ```
 
 <hr>

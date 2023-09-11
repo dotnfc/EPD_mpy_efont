@@ -18,10 +18,9 @@
 #include <freetype/ftsystem.h>
 #include <freetype/fterrors.h>
 #include <freetype/fttypes.h>
-#include <queue>
+#include "ff2_array.hpp"
 #include <string>
-#include <utility>
-#include <vector>
+
 
 #define INIT_MAGIC (uint16_t)0x55AA
 
@@ -67,6 +66,7 @@ typedef struct _ff2_context_t
 
     // internal status
     bool is_measure_width; // measure text width before drawing.
+
 } ff2_context_t, *ff2_context_p;
 
 #define CACHE_SIZE_NO_LIMIT 0
@@ -87,7 +87,7 @@ static void drawPixel(ff2_context_p pctx, int32_t x, int32_t y, uint16_t color);
 static uint16_t draw2screenMono(ff2_context_p pctx, FT_GlyphSlot glyph, uint32_t x, uint32_t y, uint16_t fg, uint16_t bg);
 static uint16_t ff2_mpy_internalDrawWString(
     ff2_context_p pctx,
-    std::vector<wchar_t> &wchars,
+    ArrayWstr &wchars,
     FT_Pos ascender,
     FT_Int cmap_index,
     FT_Vector offset);
@@ -153,6 +153,7 @@ void *ff2_mpy_loadFont(const char *file, void *old_ctx)
         return NULL;
     }
 
+    ff2_mpy_getLineHeight(pctx);    // update line height
     return pctx;
 }
 
@@ -437,7 +438,6 @@ uint16_t drawWStringUtil(void *ctx, const wchar_t *str, FT_BBox &abbox)
     bool detect_control_char = false;
     FT_Int cmap_index;
     Cursor initial_position = {pctx->rc.x, pctx->rc.y};
-    Cursor current_line_position;
 
     abbox.xMin = abbox.yMin = LONG_MAX;
     abbox.xMax = abbox.yMax = LONG_MIN;
@@ -460,7 +460,7 @@ uint16_t drawWStringUtil(void *ctx, const wchar_t *str, FT_BBox &abbox)
         FT_Vector offset = {0, 0};
         FT_Vector bearing_left = {0, 0};
         FT_BBox bbox;
-        current_line_position = {pctx->rc.x, pctx->rc.y};
+        Cursor current_line_position = {pctx->rc.x, pctx->rc.y};
 
         bbox.xMin = bbox.yMin = LONG_MAX;
         bbox.xMax = bbox.yMax = LONG_MIN;
@@ -468,7 +468,7 @@ uint16_t drawWStringUtil(void *ctx, const wchar_t *str, FT_BBox &abbox)
         detect_control_char = false;
         image_type.flags = pctx->style_mono ? FT_LOAD_TARGET_MONO : FT_LOAD_DEFAULT;
         bool isLineFirstChar = true;
-        std::vector<wchar_t> one_line_wchars;
+        ArrayWstr  one_line_wchars;
 
         // get one line
         while (*str)
@@ -486,7 +486,7 @@ uint16_t drawWStringUtil(void *ctx, const wchar_t *str, FT_BBox &abbox)
                 {
                     return 0;
                 }
-                one_line_wchars.push_back(wchar);
+                one_line_wchars.Append(wchar);
             }
         }
 
@@ -508,7 +508,7 @@ uint16_t drawWStringUtil(void *ctx, const wchar_t *str, FT_BBox &abbox)
             else if (wchar == L'\n')
             {
                 pctx->rc.x = initial_position.x;
-                pctx->rc.y += (int32_t)(ff2_mpy_getLineHeight(ctx));
+                pctx->rc.y += pctx->font_height;
             }
         }
 
@@ -522,7 +522,7 @@ uint16_t drawWStringUtil(void *ctx, const wchar_t *str, FT_BBox &abbox)
     if (detect_control_char && (wchar == L'\n'))
     {
         // If string end with '\n' control char, expand bbox
-        abbox.yMax += (int32_t)(ff2_mpy_getLineHeight(ctx));
+        abbox.yMax += pctx->font_height;
     }
 
     return next_x;
@@ -531,7 +531,7 @@ uint16_t drawWStringUtil(void *ctx, const wchar_t *str, FT_BBox &abbox)
 uint16_t ff2_mpy_drawString(void *ctx, const char *str, int16_t x, int16_t y, bool is_measure_width)
 {
     uint16_t unicode;
-    std::vector<wchar_t> wstr;
+    ArrayWstr wstr;
 
     if (ctx == NULL)
     {
@@ -543,15 +543,15 @@ uint16_t ff2_mpy_drawString(void *ctx, const char *str, int16_t x, int16_t y, bo
     while (n < len)
     {
         unicode = ff2_mpy_decode_UTF8((const uint8_t *)str, &n, len - n);
-        wstr.push_back(unicode);
+        wstr.Append(unicode);
     }
-    wstr.push_back(L'\0');
+    wstr.Append(L'\0');
 
     ff2_context_p pctx = (ff2_context_p)ctx;
     pctx->rc.x = x;
     pctx->rc.y = y;
 
-    return ff2_mpy_drawWString(ctx, wstr.data(), x, y, is_measure_width);
+    return ff2_mpy_drawWString(ctx, wstr, x, y, is_measure_width);
 }
 
 uint16_t ff2_mpy_drawWChar(void *ctx, const wchar_t wchar, int16_t x, int16_t y)
@@ -699,7 +699,7 @@ void ff2_mpy_adjustOffset(int8_t align,
 #define RENDER_MODE_MONO (FT_LOAD_RENDER | FT_LOAD_TARGET_MONO | FT_LOAD_NO_AUTOHINT | FT_OUTLINE_HIGH_PRECISION)
 uint16_t ff2_mpy_internalDrawWString(
     ff2_context_p pctx,
-    std::vector<wchar_t> &wchars,
+    ArrayWstr &wchars,
     FT_Pos ascender,
     FT_Int cmap_index,
     FT_Vector offset)
@@ -707,8 +707,6 @@ uint16_t ff2_mpy_internalDrawWString(
 
     int32_t x = pctx->rc.x;
     int32_t y = pctx->rc.y;
-    uint16_t fg = pctx->fg;
-    uint16_t bg = pctx->bg;
     FT_Error error;
     FTC_ImageTypeRec image_type = {
         .face_id = pctx->_face_id,
@@ -717,17 +715,14 @@ uint16_t ff2_mpy_internalDrawWString(
         .flags = (FT_Int32)(pctx->style_mono ? RENDER_MODE_MONO : FT_LOAD_RENDER)};
 
     uint16_t written_char_num = 0;
-    uint16_t rendering_unicode;
 
-    for (auto it = wchars.begin(); it != wchars.end(); ++it)
+    for (int32_t i = 0; i < wchars.Size(); i ++)
     {
-        rendering_unicode = *it;
-
         FT_UInt glyph_index = FTC_CMapCache_Lookup(pctx->_ftc_cmap_cache,
                                                    pctx->_face_id,
                                                    cmap_index,
-                                                   rendering_unicode);
-        FT_Glyph aglyph = {0};
+                                                   wchars[i]);
+        FT_Glyph aglyph;
         error = FTC_ImageCache_Lookup(pctx->_ftc_image_cache, &image_type, glyph_index, &aglyph, NULL);
 
         if (error)
@@ -758,14 +753,14 @@ uint16_t ff2_mpy_internalDrawWString(
 
             if (!pctx->is_measure_width)
             {
-                draw2screenMono(pctx, glyph, pos.x, pos.y, fg, bg);
+                draw2screenMono(pctx, glyph, pos.x, pos.y, pctx->fg, pctx->bg);
             }
         }
         else
         {
             // if (pctx->is_measure_width) {
             //     FT_BitmapGlyph bit = (FT_BitmapGlyph)aglyph;
-            //     draw2screen(bit, pos.x, pos.y, fg, bg);
+            //     draw2screen(bit, pos.x, pos.y, pctx->fg, pctx->bg);
             // }
         }
         adv_x = (aglyph->advance.x >> 16);
@@ -939,3 +934,4 @@ void drawPixel(ff2_context_p pctx, int32_t x, int32_t y, uint16_t color)
         mp_raise_TypeError(MP_ERROR_TEXT("Method is not callable"));
     }
 }
+

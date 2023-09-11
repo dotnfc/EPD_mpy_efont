@@ -31,12 +31,12 @@ extern "C" {
 
 #include <stdint.h>
 #include <stddef.h>
-#include <memory.h>
+
 #include "py/runtime.h"
 #include "py/obj.h"
 #include "py/reader.h"
 
-#define EF_DMSG(fmt, ...)          mp_printf(&mp_plat_print, fmt "\n", ##__VA_ARGS__)
+#define EF_DMSG(fmt, ...)          // mp_printf(&mp_plat_print, fmt "\n", ##__VA_ARGS__)
 #define DMSG                       EF_DMSG
 #define MP_RAISE_ERROR(FMT, ...)   mp_raise_msg_varg(&mp_type_RuntimeError, MP_ERROR_TEXT(FMT), ##__VA_ARGS__)
 
