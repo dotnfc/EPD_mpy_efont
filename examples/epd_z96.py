@@ -1,5 +1,5 @@
 #-*- coding:utf-8 -*-
-#
+# epd hardware demo
 # by dotnfc, 2023/06/02
 
 from micropython import const
@@ -11,9 +11,7 @@ import time
 from efont import *
 import qw_icons
 
-# Display resolution
-EPD_WIDTH  = const(400)
-EPD_HEIGHT = const(300)
+
 # datasheet says 250x122 (increased to 128 to be multiples of 8)
 
 # Display commands
@@ -46,6 +44,10 @@ TERMINATE_FRAME_READ_WRITE           = const(0xFF) # not in datasheet, aka NOOP
 BUSY = const(1)  # 1=busy, 0=idle
 
 class EPD(FrameBuffer):
+    # Display resolution
+    WIDTH  = const(400)
+    HEIGHT = const(300)
+    
     def __init__(self):
 
         self.spi = SPI(2, baudrate=20000000, polarity=0, phase=0, sck=Pin(12), mosi=Pin(11))
@@ -67,12 +69,12 @@ class EPD(FrameBuffer):
         self.rst.init(self.rst.OUT, value=0)
         self.busy.init(self.busy.IN)
         
-        self.width = EPD_WIDTH
-        self.height = EPD_HEIGHT
+        self.width = self.WIDTH
+        self.height = self.HEIGHT
 
         self.size = self.width * self.height // 8
         self.buf = bytearray(self.size)
-        super().__init__(self.buf, EPD_WIDTH, EPD_HEIGHT, MONO_HLSB)
+        super().__init__(self.buf, self.WIDTH, self.HEIGHT, MONO_HLSB)
         
     LUT_FULL_UPDATE    = bytearray(b'\x80\x60\x40\x00\x00\x00\x00\x10\x60\x20\x00\x00\x00\x00\x80\x60\x40\x00\x00\x00\x00\x10\x60\x20\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x03\x03\x00\x00\x02\x09\x09\x00\x00\x02\x03\x03\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x15\x41\xA8\x32\x30\x0A')
     LUT_PARTIAL_UPDATE = bytearray(b'\x00\x00\x00\x00\x00\x00\x00\x80\x00\x00\x00\x00\x00\x00\x40\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0A\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x15\x41\xA8\x32\x30\x0A')
@@ -237,13 +239,13 @@ def test_font():
     #epd.displayBuffer()
     
     #time.sleep(1.5)
-    ico = FT2("/fonts/qweather-icons.ttf", render=epd, size=32)
+    ico = FT2("font/qweather-icons.ttf", render=epd, size=32)
     ico.mono=True
-    ff = FT2("/fonts/simyou-lite.ttf", render=epd, size=16)
+    ff = FT2("font/simyou-lite.ttf", render=epd, size=16)
     ff.mono=True
-    wqy = FT2("/fonts/wenquanyi_12pt.pcf", render=epd, size=16)
+    wqy = FT2("font/wenquanyi_12pt.pcf", render=epd, size=16)
     wqy.mono=True
-    wqyb = FT2("/fonts/wenquanyi_12ptb.pcf", render=epd, size=16)
+    wqyb = FT2("font/wenquanyi_12ptb.pcf", render=epd, size=16)
     wqyb.mono=True
 
     epd.fill(white)
@@ -270,7 +272,7 @@ def test_image():
     
     ima = Image(epd.WIDTH, epd.HEIGHT)
     
-    ima.load("/image/hello.png", True)
+    ima.load("image/hello.png", True)
     print(f"w:{ima.width} h:{ima.height}")
     
     ima.draw(epd, 0, 0, 200, 200)
@@ -279,3 +281,4 @@ def test_image():
 if __name__ == "__main__":
     test_font()
     #test_image()
+
