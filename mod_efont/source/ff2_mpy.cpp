@@ -92,6 +92,21 @@ static uint16_t ff2_mpy_internalDrawWString(
     FT_Int cmap_index,
     FT_Vector offset);
 
+
+void* ff2_mpy_get_mp_file_obj(void *ctx)
+{
+    ff2_context_p pctx = (ff2_context_p)ctx;
+    if(pctx == NULL) 
+        return NULL;
+    
+    // see ff2_mpy_system.c | FT_Stream_Open()
+    ff2_file_t *file = (ff2_file_t *)pctx->g_FtLibrary->memory->user;
+    if(file == NULL)
+        return NULL;
+    
+    return file->file_obj;
+}
+
 void *ff2_mpy_loadFont(const char *file, void *old_ctx)
 {
     FT_Face face;
@@ -106,7 +121,7 @@ void *ff2_mpy_loadFont(const char *file, void *old_ctx)
     }
 
     memset(pctx, 0, sizeof(ff2_context_t));
-    pctx->font_height = -1;
+    pctx->font_height = 0;
     pctx->font_file = file;
 
     if (pctx->g_FtLibraryLoaded != INIT_MAGIC)
@@ -201,7 +216,7 @@ int16_t ff2_mpy_getLineHeight(void *ctx)
     ff2_context_p pctx = (ff2_context_p)ctx;
 
     if (pctx->font_height > 0)
-    {
+    {   // cached
         return pctx->font_height;
     }
 
@@ -314,11 +329,6 @@ void ff2_mpy_setTextBBox(void *ctx, int16_t x, int16_t y, uint16_t w, uint16_t h
     pctx->rc.y = y;
     pctx->rc.w = w;
     pctx->rc.h = h;
-}
-
-uint16_t drawWCharUtil(const uint32_t wchar, FT_BBox *abbox)
-{
-    return 0;
 }
 
 bool getCmapInfo(ff2_context_p pctx, FT_Int &cmap_index, FT_Pos &ascender)

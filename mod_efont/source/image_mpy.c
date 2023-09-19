@@ -22,8 +22,7 @@
 
 typedef struct _IMA_IO
 {
-
-    fileclass_t *fp; // File pointer for input function
+    ff2_file_t *fp; // File pointer for input function
 
     uint16_t dst_fbuf_width;  // Width of  the destination FrameBuffer [pix]
     uint16_t dst_fbuf_height; // Height of the destination FrameBuffer [pix]

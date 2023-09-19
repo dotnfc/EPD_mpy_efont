@@ -51,26 +51,31 @@ extern "C" {
 //
 // filesystem porting
 // 
-#define FT_FILE fileclass_t
+#define FT_FILE ff2_file_t
 #define ft_fclose ff2_fclose
 #define ft_fopen ff2_fopen
 #define ft_fread ff2_fread
 #define ft_fseek ff2_fseek
 #define ft_ftell ff2_ftell
 
-typedef struct {
-    mp_obj_t     file;
-} fileclass_t;
+typedef struct _ff2_file_t
+{
+    mp_obj_t file_obj;
+} ff2_file_t;
 
-fileclass_t *ff2_from_file_obj(mp_obj_t file_obj);
-fileclass_t *ff2_fopen(const char *Filename, const char *mode);
-void ff2_fclose(fileclass_t *stream);
-size_t ff2_fread(void *ptr, size_t size, size_t nmemb, fileclass_t *stream);
-int ff2_fseek(fileclass_t *stream, long int offset, int whence);
-long int ff2_ftell(fileclass_t *stream);
+#define FF2_FILE_MAX        5
+#define FF2_FILE_OBJ_MAGIC  (uint32_t)0x5A5A5A5A
+
+ff2_file_t *ff2_fopen(const char *filename, const char *mode);
+void ff2_fclose(ff2_file_t *stream);
+size_t ff2_fread(void *ptr, size_t size, size_t nmemb, ff2_file_t *stream);
+size_t ff2_fwrite(ff2_file_t *stream, void *buf, size_t num_bytes);
+int ff2_fseek(ff2_file_t *stream, long int offset, int whence);
+long int ff2_ftell(ff2_file_t *stream);
 
 // helper 
 typedef void * ff2_handler;
+void*    ff2_mpy_get_mp_file_obj(void *ctx);
 void*    ff2_mpy_loadFont(const char *file, void *old_ctx);
 void     ff2_mpy_unloadFont(void *ctx);
 int16_t  ff2_mpy_getLineHeight(void *ctx);
@@ -89,6 +94,10 @@ void     ff2_mpy_setItalic(void* ctx, bool italic);
 uint16_t ff2_mpy_drawString(void* ctx, const char *str, int16_t x, int16_t y, bool is_measure_width);
 uint16_t ff2_mpy_drawWChar(void* ctx, const wchar_t wchar, int16_t x, int16_t y);
 uint16_t ff2_mpy_drawWString(void* ctx, const wchar_t *wstr, int16_t x, int16_t y, bool is_measure_width);
+
+// font file util
+void efont_register_file_obj(ff2_file_t *stream);
+void efont_unregister_file_obj(ff2_file_t *stream);
 
 #ifdef __cplusplus
 }

@@ -43,6 +43,8 @@ typedef struct _mp_obj_FT2_t
     mp_obj_base_t base;
     ff2_handler hff2;
 
+    mp_obj_t hfont; // font file handle within hff2
+
     uint16_t size;
     bool mono;
     bool bold;
@@ -99,10 +101,13 @@ STATIC mp_obj_t mod_efont_FT2_make_new(const mp_obj_type_t *type, size_t n_args,
 
     mp_obj_FT2_t *self = mp_obj_malloc(mp_obj_FT2_t, type);
     self->hff2 = hFont;
+    self->hfont = ff2_mpy_get_mp_file_obj(hFont);
     self->size = (uint16_t)(args[ARG_size].u_int & 0xfff);
     self->mono = args[ARG_mono].u_bool;
     self->bold = args[ARG_bold].u_bool;
     self->italic = args[ARG_italic].u_bool;
+
+    mp_printf(&mp_plat_print, "efont new %s: %p, %p\n", font_file, self->hff2, self->hfont);
 
     // a render with method setPixel(x, y, c) routine, aka framebuf
     mp_obj_t render = mp_const_none;
@@ -348,7 +353,7 @@ STATIC void mod_efont_FT2_attr(mp_obj_t self_in, qstr attr, mp_obj_t *dest)
 }
 
 // FT2 class stuff
-STATIC const mp_rom_map_elem_t mod_efont_FT2_locals_dict_table[] = {
+STATIC const mp_rom_map_elem_t mod_efont_FT2_locals_dict_table[] = {    
     // method
     {MP_ROM_QSTR(MP_QSTR_drawString), MP_ROM_PTR(&mod_efont_FT2_drawString_obj)},
     {MP_ROM_QSTR(MP_QSTR_getStringWidth), MP_ROM_PTR(&mod_efont_FT2_getStringWidth_obj)},
@@ -365,6 +370,8 @@ STATIC MP_DEFINE_CONST_OBJ_TYPE(
     attr, mod_efont_FT2_attr,
     locals_dict, &mod_efont_FT2_locals_dict);
 
+
+///////////////////////////////////////////////////////////////////////////////////////
 // class Image(object):
 typedef struct _mp_obj_Image_t
 {
@@ -591,11 +598,64 @@ STATIC MP_DEFINE_CONST_OBJ_TYPE(
     MP_TYPE_FLAG_NONE,
     make_new, mod_efont_Image_make_new,
     attr, mod_efont_Image_attr,
-    locals_dict, &mod_efont_Image_locals_dict);
+    locals_dict, &mod_efont_Image_locals_dict
+);
+
+void efont_register_file_obj(ff2_file_t *stream)
+{
+    // mp_obj_t hfile = stream->file_obj;
+    // for (int8_t i = 1; i < FF2_FILE_MAX; i ++) 
+    // {
+    //     if (MP_STATE_VM(ff2_files_objs[i] == (mp_obj_t)0))
+    //     {
+    //         MP_STATE_VM(ff2_files_objs[i]) = (mp_obj_t)hfile;
+    //         return;
+    //     }
+    // }
+
+    // MP_RAISE_ERROR("too many font file to open");
+}
+
+void efont_unregister_file_obj(ff2_file_t *stream)
+{
+    // mp_obj_t hfile = stream->file_obj;
+    // for (int8_t i = 1; i < FF2_FILE_MAX; i ++) 
+    // {
+    //     if (MP_STATE_VM(ff2_files_objs[i] == (mp_obj_t)hfile))
+    //     {
+    //         MP_STATE_VM(ff2_files_objs[i]) = (mp_obj_t)0;
+    //         return;
+    //     }
+    // }
+
+    // MP_RAISE_ERROR("too many font file to open");
+}
+
 // module stuff
+STATIC mp_obj_t efont_package___init___(void) 
+{
+    if (MP_STATE_VM(ff2_files_objs[0] != (mp_obj_t)FF2_FILE_OBJ_MAGIC))
+    {
+        // __init__ for builtins is called each time the module is imported,
+        //   so ensure that initialisation only happens once.
+        MP_STATE_VM(ff2_files_objs[0]) = (mp_obj_t)FF2_FILE_OBJ_MAGIC;
+
+        for (int8_t i = 1; i < FF2_FILE_MAX; i ++) 
+        {
+            MP_STATE_VM(ff2_files_objs[i]) = (mp_obj_t)0;
+        }
+        // mp_printf(&mp_plat_print, "example_package.__init__\n");
+    }
+    return mp_const_none;
+}
+STATIC MP_DEFINE_CONST_FUN_OBJ_0(efont_package___init___obj, efont_package___init___);
+
+// files open by freetype is stored on mp_state so that it is cleared on soft reset.
+MP_REGISTER_ROOT_POINTER(mp_obj_t ff2_files_objs[FF2_FILE_MAX]);
 
 STATIC const mp_rom_map_elem_t mp_module_efont_globals_table[] = {
     {MP_ROM_QSTR(MP_QSTR___name__), MP_ROM_QSTR(MP_QSTR__efont)},
+    {MP_ROM_QSTR(MP_QSTR___init__), MP_ROM_PTR(&efont_package___init___obj) },
     {MP_ROM_QSTR(MP_QSTR_FT2), MP_ROM_PTR(&mod_efont_FT2_type)},
     {MP_ROM_QSTR(MP_QSTR_Image), MP_ROM_PTR(&mod_efont_Image_type)},
 

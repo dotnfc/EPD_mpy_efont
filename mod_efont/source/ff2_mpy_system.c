@@ -217,8 +217,9 @@
 
     file = STREAM_FILE( stream );
 
-    if ( stream->pos != offset )
+    if ( stream->pos != offset ) {
       ft_fseek( file, (long)offset, SEEK_SET );
+    }
 
     /* Avoid calling `fread` with `buffer=NULL` and `count=0`, */
     /* which is undefined behaviour.                           */
@@ -236,7 +237,6 @@
                   const char*  filepathname )
   {
     FT_FILE*  file;
-
 
     if ( !stream )
       return FT_THROW( Invalid_Stream_Handle );
@@ -256,6 +256,9 @@
 
       return FT_THROW( Cannot_Open_Resource );
     }
+
+    // tell upper layer this file referenced, gc.swap() should skip it.
+    stream->memory->user = file;
 
     ft_fseek( file, 0, SEEK_END );
     stream->size = (unsigned long)ft_ftell( file );
@@ -299,7 +302,6 @@
   {
     FT_Memory  memory;
 
-
     memory = (FT_Memory)ft_smalloc( sizeof ( *memory ) );
     if ( memory )
     {
@@ -331,50 +333,51 @@
 #include "py/stream.h"
 #include "extmod/vfs.h"
 
-fileclass_t *ff2_from_file_obj(mp_obj_t file_obj)
-{
-    fileclass_t *file = m_new_obj(fileclass_t);
-    memset(file, 0, sizeof(*file));
-    file->file = file_obj;
-
-    return file;
-}
-
-fileclass_t *ff2_fopen(const char *Filename, const char *mode)
+ff2_file_t *ff2_fopen(const char *filename, const char *mode)
 {   
-    fileclass_t *ff2_file = m_malloc(sizeof(fileclass_t));
+    ff2_file_t *ff2_file = m_malloc(sizeof(ff2_file_t));
     if (ff2_file == NULL)
     {
-        m_malloc_fail(sizeof(fileclass_t));
+        m_malloc_fail(sizeof(ff2_file_t));
     }
 
-    mp_obj_t mode_obj = mp_obj_new_str(mode, strlen(mode));
     mp_obj_t args[2] = 
     {
-        mp_obj_new_str(Filename, strlen(Filename)),
-        mode_obj // MP_OBJ_NEW_QSTR(MP_QSTR_rb),
+        mp_obj_new_str(filename, strlen(filename)),
+        mp_obj_new_str(mode, strlen(mode))
     };
-    ff2_file->file = mp_vfs_open(MP_ARRAY_SIZE(args), &args[0], (mp_map_t *)&mp_const_empty_map);
+    ff2_file->file_obj = mp_vfs_open(MP_ARRAY_SIZE(args), &args[0], (mp_map_t *)&mp_const_empty_map);
+
     return ff2_file;
 }
 
-void ff2_fclose(fileclass_t *stream) 
-{    
-    mp_stream_close(stream->file);
+void ff2_fclose(ff2_file_t *file) 
+{
+    if ( (file == NULL) || (file->file_obj == NULL) )
+    {
+        return;
+    }
+    mp_stream_close(file->file_obj);
 
 #if MICROPY_MALLOC_USES_ALLOCATED_SIZE
-    m_free(stream, sizeof(fileclass_t));
+    m_free(file, sizeof(ff2_file_t));
 #else // !MICROPY_MALLOC_USES_ALLOCATED_SIZE
-    m_free(stream);
+    m_free(file);
 #endif // MICROPY_MALLOC_USES_ALLOCATED_SIZE
-    
+    file->file_obj = NULL;
 }
 
-size_t ff2_fread(void *ptr, size_t size, size_t nmemb, fileclass_t *stream) 
+size_t ff2_fread(void *ptr, size_t size, size_t nmemb, ff2_file_t *file) 
 {
-    size_t total = size * nmemb;
+    if ( (file == NULL) || (file->file_obj == NULL) )
+    {
+        mp_raise_msg(&mp_type_RuntimeError, MP_ERROR_TEXT("invald file handle"));
+        return 0;
+    }
+
     int errcode;
-    size_t readlen = mp_stream_read_exactly(stream->file, ptr, total, &errcode);
+    size_t total = size * nmemb;
+    size_t readlen = mp_stream_read_exactly(file->file_obj, ptr, total, &errcode);
 
     if (errcode != 0) 
     {
@@ -386,8 +389,14 @@ size_t ff2_fread(void *ptr, size_t size, size_t nmemb, fileclass_t *stream)
     }
 }
 
-int ff2_fseek(fileclass_t *stream, long int offset, int whence) 
+int ff2_fseek(ff2_file_t *file, long int offset, int whence) 
 {
+    if ( (file == NULL) || (file->file_obj == NULL) )
+    {
+        mp_raise_msg(&mp_type_RuntimeError, MP_ERROR_TEXT("invald file handle"));
+        return 0;
+    }
+
     switch(whence)
     {
         case SEEK_SET: whence = MP_SEEK_SET; break;
@@ -395,12 +404,18 @@ int ff2_fseek(fileclass_t *stream, long int offset, int whence)
         case SEEK_END: whence = MP_SEEK_END; break;
         default:       whence = MP_SEEK_SET; break;
     }
-    return mp_stream_posix_lseek(stream->file, offset, whence);
+    return mp_stream_posix_lseek(file->file_obj, offset, whence);
 }
 
-long int ff2_ftell(fileclass_t *stream) 
+long int ff2_ftell(ff2_file_t *file) 
 {
+    if ( (file == NULL) || (file->file_obj == NULL) )
+    {
+        mp_raise_msg(&mp_type_RuntimeError, MP_ERROR_TEXT("invald file handle"));
+        return 0;
+    }
+    
     // see 'stream_tell() == stream_seek(0, MP_SEEK_CUR)'
-    return mp_stream_posix_lseek(stream->file, 0, MP_SEEK_CUR);
+    return mp_stream_posix_lseek(file->file_obj, 0, MP_SEEK_CUR);
 }
 

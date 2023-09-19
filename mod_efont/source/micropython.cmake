@@ -8,6 +8,9 @@ add_library(usermod_efont INTERFACE)
 
 # message(STATUS "CMAKE_CURRENT_LIST_DIR=> ${CMAKE_CURRENT_LIST_DIR}")
 
+# this line will generate debug symbol for you and can be used for backtrace analyzer
+target_compile_options(usermod_efont INTERFACE -g)
+
 file(GLOB_RECURSE FREETYPEE_SRC ${CMAKE_CURRENT_LIST_DIR}/*.c)
 
 # Add our source files to the lib
