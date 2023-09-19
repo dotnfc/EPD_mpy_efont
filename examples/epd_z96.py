@@ -72,47 +72,50 @@ class EPD(FrameBuffer):
         self.width = self.WIDTH
         self.height = self.HEIGHT
 
-        self.size = self.width * self.height // 8
+        self.size = self.WIDTH * self.HEIGHT // 8
         self.buf = bytearray(self.size)
         super().__init__(self.buf, self.WIDTH, self.HEIGHT, MONO_HLSB)
         
     LUT_FULL_UPDATE    = bytearray(b'\x80\x60\x40\x00\x00\x00\x00\x10\x60\x20\x00\x00\x00\x00\x80\x60\x40\x00\x00\x00\x00\x10\x60\x20\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x03\x03\x00\x00\x02\x09\x09\x00\x00\x02\x03\x03\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x15\x41\xA8\x32\x30\x0A')
     LUT_PARTIAL_UPDATE = bytearray(b'\x00\x00\x00\x00\x00\x00\x00\x80\x00\x00\x00\x00\x00\x00\x40\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0A\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x15\x41\xA8\x32\x30\x0A')
 
-    def clearBuffer(self):
+    def clearBuffer(self, color=255):
         self._command(b'\x24')
         for i in range(0, len(self.buf)):
-            self.buf[i] = 255
-            self._data(bytearray([self.buf[i]]))
+            self.buf[i] = color
 
     def displayBuffer(self, buf = None):
         self._command(b'\x24')
         
         if buf is not None:
-            for i in range(0, len(buf)):
-                self._data(bytearray([buf[i]]))
+            self._data(buf)                
         else:
-            for i in range(0, len(self.buf)):
-                self._data(bytearray([self.buf[i]]))
+            self._data(self.buf)
         self._command(b'\x22')
         self._command(b'\xC7')
         self._command(b'\x20')
-        self._command(bytearray([TERMINATE_FRAME_READ_WRITE]))
+        self._command(TERMINATE_FRAME_READ_WRITE)
         self.wait_until_idle()
 
     def _command(self, command, data=None):
         self.cs(1) # according to LOLIN_EPD
         self.dc(0)
         self.cs(0)
+        if isinstance(command, int):
+            command = bytearray([command])
         self.spi.write(command)
         self.cs(1)
         if data is not None:
+            if isinstance(data, int):
+                data = bytearray([data])
             self._data(data)
 
     def _data(self, data):
         self.cs(1) # according to LOLIN_EPD
         self.dc(1)
         self.cs(0)
+        if isinstance(data, int):
+            data = bytearray([data])
         self.spi.write(data)
         self.cs(1)
 

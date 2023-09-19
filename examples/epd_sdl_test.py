@@ -5,8 +5,7 @@
 from efont import *
 from epd_sdl_420bw import *
 import time
-import machine
-
+import gc
 
 def testFT2():
     import qw_icons
@@ -27,8 +26,8 @@ def testFT2():
     wqyb = FT2("font/wenquanyi_12ptb.pcf", render=epd, size=16)
     wqyb.mono=True
     
-    ff.drawString(0, 50, 400, 24, ALIGN_CENTER, "你好世界！Hello World!", 24)
-
+    # ff.drawString(0, 50, 400, 24, ALIGN_CENTER, "你好世界！Hello World!", 24)
+    ff.drawString(0, 50, 400, 24, ALIGN_CENTER, "2023-09-14")
     ico.drawString(10, 100, 400, 32, ALIGN_LEFT, qw_icons.ICO_LOGO_NFC, 64)
     ico.drawString(80, 100, 400, 32, ALIGN_LEFT, qw_icons.ICO_LOGO_NFC, 48)
     ico.drawString(132, 100, 400, 32, ALIGN_LEFT, qw_icons.ICO_LOGO_NFC, 32)
@@ -36,6 +35,12 @@ def testFT2():
     
     wqy.drawString(10, 180, 200, 24, ALIGN_LEFT, "文泉驿点阵 16x16") # 你好世界 
     wqyb.drawString(10, 200, 200, 24, ALIGN_LEFT, "文泉驿点阵 16x16 粗体") # 你好世界 
+    epd.displayBuffer()
+    
+    gc.collect()
+    epd.fill(white)
+    epd.rect(2, 230, 230, 2, black, True)
+    ff.drawString(0, 50, 400, 24, ALIGN_CENTER, "2023-09-14")
     epd.displayBuffer()
     
     while(not epd.eventProcess()):
@@ -64,12 +69,33 @@ def testImage(filename):
         time.sleep(0.01)
     pass
 
-def testPng():
-    pass
+def testGC():
+    epd = Epd420BW()
+    epd.init()
+    epd.clearBuffer()
+   
+    black = 0
+    white = 1
+    epd.fill(white)
+    ff = FT2("font/simyou-lite.ttf", render=epd, size=16)
+    ff.mono=True        
 
+    ff.drawString(0, 50, 400, 24, ALIGN_CENTER, "2023-09-14")
+    epd.displayBuffer()
+    
+    gc.collect()
+    epd.fill(white)
+    epd.rect(2, 230, 230, 2, black, True)
+    ff.drawString(0, 50, 400, 24, ALIGN_CENTER, "2023-09-15")
+    epd.displayBuffer()
+    
+    while(not epd.eventProcess()):
+        time.sleep(0.01)
+        
+   
 if __name__ == "__main__":
-
-    testFT2()
+    testGC()
+    #testFT2()
     # testImage("image/hello.png")
 
     pass
