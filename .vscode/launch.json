@@ -18,7 +18,7 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "/home/dotnfc/mpy/EPD_mpy_efont/micropython/ports/unix/build-standard/micropython",
-            "args": ["hello.py"],
+            "args": ["epd_sdl_test.py"],
             "stopAtEntry": false,
             "miDebuggerArgs": "",
             "cwd": "/home/dotnfc/mpy/EPD_mpy_efont/examples/",
@@ -29,7 +29,7 @@
                 },
                 {
                     "name": "MICROPYPATH",
-                    "value": "/home/dotnfc/mpy/EPD_mpy_efont/examples"
+                    "value": ".frozen:/home/dotnfc/mpy/EPD_mpy_efont/examples:/home/dotnfc/mpy/EPD_mpy_efont/examples/lib"
                 },
             ],
             "externalConsole": false,
@@ -50,5 +50,16 @@
                 }
             ]
         },
+        {
+            "name": "ESP-IDF Debug: Launch",
+            "type": "espidf",
+            "request": "launch",
+            "initGdbCommands": [
+                "symbol-file /home/dotnfc/mpy/EPD_mpy_efont/micropython/ports/esp32/build-EFORE_S3/micropython.elf",
+                "mon reset halt",
+                "flushregs",
+                "thb app_main"
+            ]
+        }
     ]
 }
