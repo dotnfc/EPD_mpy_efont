@@ -45,6 +45,10 @@ The parameter after -s should preferably match the size of the vfs partition in 
 ### 4.2 Write the image
 
 ```ps
+--- wsl2 shell ---
+> esptool.py  --before default_reset --after hard_reset --chip esp32s3 --baud 921600 --port /dev/ttyACM0 write_flash -z 0x290000 efore_s3_vfs.bin
+
+--- windows ps ---
 > esptool  --before default_reset --after hard_reset --chip esp32s3 --baud 921600 --port com6 write_flash -z 0x290000 efore_s3_vfs.bin
 ```
 
