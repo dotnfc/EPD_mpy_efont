@@ -1,9 +1,21 @@
 {
+    "python.languageServer": "Pylance",
+    "python.analysis.autoSearchPath": true,
+    "python.autoComplete.extraPaths": [
+        "examples/.efont",
+        "examples/lib",
+        "mod_efont/modules",
+    ],
     "idf.adapterTargetName": "esp32s3",
     "idf.buildPath":"${workspaceFolder}/micropython/ports/esp32/build-EFORE_S3",
     "idf.openOcdConfigs": [
         "board/esp32s3-builtin.cfg"
     ],
     "idf.port": "/dev/ttyACM0",
-    "idf.flashType": "JTAG"
+    "idf.flashType": "JTAG",
+    "python.analysis.extraPaths": [
+        "examples/.efont",
+        "examples/lib",
+        "mod_efont/modules",
+    ]
 }
