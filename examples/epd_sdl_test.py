@@ -3,7 +3,7 @@
 # by dotnfc, 2023/09/11
 
 from efont import *
-from epd_sdl_420bw import *
+from panel.epd_sdl_420bw import *
 import time
 import gc
 import ujson as json
