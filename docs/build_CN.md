@@ -73,6 +73,9 @@ $ cp -f build-EFORE_S3/firmware.bin /mnt/d/mpy-efore-s3.bin
 ```ps
 > . /home/dotnfc/esp/esp-idf-v5.0.2/export.sh 可能需要
 > sudo chmod +666 /dev/ttyACM0  可能需要
+
+> esptool.py -p /dev/ttyACM0 --before default_reset --after hard_reset --chip esp32s3 --baud 921600 write_flash -z 0 build-EFORE_S3/firmware.bin
+
 > esptool.py -p /dev/ttyACM0 -b 921600 --before default_reset --after hard_reset --chip esp32s3  write_flash --flash_mode dio --flash_size 8MB --flash_freq 80m 0x0 build-EFORE_S3/bootloader/bootloader.bin 0x8000 build-EFORE_S3/partition_table/partition-table.bin 0x10000 build-EFORE_S3/micropython.bin
 ```
 
