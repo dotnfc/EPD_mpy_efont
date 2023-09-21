@@ -179,7 +179,7 @@ def getIcon(weather):
 
 def weather_demo():
     ssid     = "DOTNFC-HOS"
-    password = "20180903"
+    password = "********"
     
     epd = EpdImage()
     epd.init()
