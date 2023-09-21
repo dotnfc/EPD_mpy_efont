@@ -81,6 +81,17 @@ mpy 的 esp32 port 需要做一个 [patch](tools/esp32-patch.diff)
 #define MP_TASK_STACK_SIZE      (24 * 1024)
 ```
 
+- 为避免字体文件句柄被垃圾回收，暂时需要修改
+```c
+// micropython/extmod/vfs_fat_file.c
+STATIC mp_obj_t fat_vfs_open(mp_obj_t self_in, mp_obj_t path_in, mp_obj_t mode_in) {
+    ...
+    
+    pyb_file_obj_t *o = m_new_obj(pyb_file_obj_t); // m_new_obj_with_finaliser(pyb_file_obj_t);
+    o->base.type = type;
+    ...
+}
+```
 <hr>
 
 ## 参考

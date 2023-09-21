@@ -74,6 +74,18 @@ micropython/ports/esp32/main.c
 #define MP_TASK_STACK_SIZE      (24 * 1024)
 ```
 
+- To prevent the font file handle from being garbage collected, the following modifications are required:
+
+```c
+// micropython/extmod/vfs_fat_file.c
+STATIC mp_obj_t fat_vfs_open(mp_obj_t self_in, mp_obj_t path_in, mp_obj_t mode_in) {
+    ...
+    
+    pyb_file_obj_t *o = m_new_obj(pyb_file_obj_t); // m_new_obj_with_finaliser(pyb_file_obj_t);
+    o->base.type = type;
+    ...
+}
+```
 <hr>
 
 ## References
