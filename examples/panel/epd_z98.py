@@ -1,5 +1,5 @@
 #-*- coding:utf-8 -*-
-# epd hardware demo
+# GDEY042Z98 | FPC-191 | SSD1683
 # by dotnfc, 2023/06/02
 
 from micropython import const
@@ -9,10 +9,16 @@ from framebuf import *
 
 BUSY = const(1)  # 1=busy, 0=idle
 
+def dprint(*args, **kwargs):
+    should_print = True
+    if should_print:
+        print(*args, **kwargs)
+        
 class EPD(FrameBuffer):
     # Display resolution
     WIDTH  = const(400)
     HEIGHT = const(300)
+    BUF_SIZE = const(WIDTH * HEIGHT // 8)
     
     def __init__(self):
 
@@ -35,43 +41,47 @@ class EPD(FrameBuffer):
         self.rst.init(self.rst.OUT, value=0)
         self.busy.init(self.busy.IN)
         
-        self.width = self.WIDTH
-        self.height = self.HEIGHT
-
-        self.size = self.WIDTH * self.HEIGHT // 8
-        self.buf = bytearray(self.size)
+        self.buf = bytearray(self.BUF_SIZE)
         super().__init__(self.buf, self.WIDTH, self.HEIGHT, MONO_HLSB)
         
     LUT_FULL_UPDATE = bytearray(b'\x01\x05\x00\x00\x05\x01\x01\x03\x06\x06\x06\x06\x01\x01\x01\x00\x00\x15\x20\x01\x01\x01\x35\x00\x00\x00\x01\x00\x02\x05\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x01\x05\x00\x00\x05\x01\x01\x03\x46\x86\x46\x86\x01\x01\x01\x00\x00\x15\xa0\x01\x01\x01\x35\x00\x00\x00\x01\x00\x02\x05\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x01\x05\x00\x00\x05\x01\x01\x03\x46\x86\x46\x86\x01\x01\x01\x00\x00\x95\x20\x01\x01\x01\x75\x00\x00\x00\x01\x00\x02\x05\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x01\x05\x00\x00\x05\x01\x01\x03\x46\x86\x46\x86\x01\x01\x01\x00\x00\x15\xa0\x01\x01\x01\x35\x00\x00\x00\x01\x00\x02\x05\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x01\x05\x00\x00\x05\x01\x01\x03\x46\x86\x46\x86\x01\x01\x01\x00\x00\x95\x20\x01\x01\x01\x75\x00\x00\x00\x01\x00\x02\x05\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x04')
     LUT_PARTIAL_UPDATE = bytearray(b'\x01\x19\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01\x59\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01\x99\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x04')
 
-    def clearBuffer(self, color=255):
-        self.fill(color)
-
-    def displayBuffer(self, buf=None, full=True):
-        '''
-        update screen contents
-        :param buf: the display contents to screen, can be none to use internal buffer
-        :param full: whether to update the entire screen, or just the part of the screen that has changed
-        '''
-        self._command(0x24)
+    def refresh(self, buf=None, full=True):
+        '''Update screen contents.
         
+        Args:
+            - buf: the display contents to screen, can be none to use internal buffer
+            - full: whether to update the entire screen, or just the partial of it
+        '''
+
+        if full:
+            dprint("refresh full screen")
+            self.init_full()            
+        else:
+            dprint("refresh partial screen")
+            self.init_partial()
+            self.set_memory_area(0, 0, self.WIDTH, self.HEIGHT)
+
+        self._command(0x24)
         if buf is not None:
             self._data(buf)
         else:
             self._data(self.buf)
+
+        if full:
+            self.update_full()
+        else:
+            self.update_partial()
+            
+        self.wait_until_idle()
 
         self._command(0x26)
         if buf is not None:
             self._data(buf)
         else:
             self._data(self.buf)
-
-        self._command(0x22)
-        self._data(0xcf)
-        self._command(0x20)
-        self.wait_until_idle()
-
+            
     def _command(self, command, data=None):
         self.cs(1) # according to LOLIN_EPD
         self.dc(0)
@@ -107,15 +117,16 @@ class EPD(FrameBuffer):
         self.wait_until_idle()
     
     def init(self):
-        ...
-            
-    def init_panel(self):
-        self.reset()
-        self.wait_until_idle()
-        
+        self.init_full()
+
+    def init_panel(self, reset=True):
+        if reset:
+            self.reset()
+            self.wait_until_idle()
+
         self._command(0x12); # soft reset
         self.wait_until_idle()
-
+        
         self._command(0x01, b'\x2B\x01\x00')  # Set MUX as 300
         
         self._command(0x3C)  # BorderWavefrom
@@ -134,23 +145,29 @@ class EPD(FrameBuffer):
         self._command(0x18)
         self._data(0X80)
         
-        self.set_lut(self.LUT_FULL_UPDATE)
-        
-        self._command(0x11, 0x03)  # Data entry mode
-        
         self.set_memory_area(0, 0, self.WIDTH, self.HEIGHT)
+
+    def init_full(self):
+        self.init_panel()
+        self.set_lut(self.LUT_FULL_UPDATE)        
+        self.power_on()
+            
+    def init_partial(self):
+        self.init_panel(False)
+        self._command(0x2C, 0x26); # VCOM Voltage
+        self.set_lut(self.LUT_PARTIAL_UPDATE)
+        self.power_on()
+        
+    def update_full(self):
+        self._command(0x22, 0xcf)
+        self._command(0x20)
         self.wait_until_idle()
-        self.powerOn()
+
+    def update_partial(self):
+        self._command(0x22, 0xcf)
+        self._command(0x20)
+        self.wait_until_idle()
     
-    def set_update_mode(self, full=True):
-        if full:
-            self._command(0x24)
-            self._data()
-        else:
-            self._command(0x20)
-            
-            self.wait_until_idle()
-            
     def wait_until_idle(self):
             while self.busy.value() == BUSY:
                 sleep_ms(100)
@@ -166,9 +183,12 @@ class EPD(FrameBuffer):
         sleep_ms(10)
 
         self.rst(1)
-
+        
     # specify the memory area for data R/W
     def set_memory_area(self, x_start, y_start, x_end, y_end):
+        self._command(0x11); # set ram entry mode
+        self._data(0x03);    # x increase, y increase : normal mode
+  
         # x point must be the multiple of 8 or the last 3 bits will be ignored
         self._command(0x44)
         self._data(x_start // 8)
@@ -179,25 +199,42 @@ class EPD(FrameBuffer):
         self._data(y_start // 256)
         self._data((y_start + y_end - 1) % 256)
         self._data((y_start + y_end - 1) // 256)
+        
         self._command(0x4e)
         self._data(x_start // 8)
         self._command(0x4f)
         self._data(y_start % 256)
         self._data(y_start // 256)
 
-    # to wake call reset() or init()
+        self.wait_until_idle()
+        
+    # to wakeup panel, just call reset() or init()
     def sleep(self):
+        self.power_off()
         self._command(0x10)
         self._data(0x01)
         #self.wait_until_idle()
 
-
 def main():
+    import time
     epd = EPD()
     epd.init()
+    
     epd.fill(1)
-    epd.text('Hello world', 0, 20, 0)
-    epd.displayBuffer()
-        
+    epd.text('Hello world', 10, 60, 0)
+    epd.refresh()
+    time.sleep(1)
+    
+    # epd.fill(1)
+    # epd.text('i am dotnfc', 10, 160, 0)
+    # epd.refresh()
+    # time.sleep(1)
+    
+    #epd.fill(1)
+    epd.text('dotnfc here', 0, 10, 0)
+    epd.refresh(full=False)
+    
+    epd.sleep()
+
 if __name__ == "__main__":
     main()

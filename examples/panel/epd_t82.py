@@ -308,8 +308,7 @@ class EPD(FrameBuffer):
 
         self.EPD_Part_Update()
 
-    # Deep sleep function
-    def EPD_DeepSleep(self):
+    def deepsleep(self):
         self._command(0x10)  # Enter deep sleep
         self._data(0x01)
         time.sleep(0.1)

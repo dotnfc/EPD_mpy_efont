@@ -84,7 +84,7 @@ class EPD(FrameBuffer):
         for i in range(0, len(self.buf)):
             self.buf[i] = color
 
-    def displayBuffer(self, buf = None):
+    def refresh(self, buf = None):
         self._command(b'\x24')
         
         if buf is not None:
@@ -239,7 +239,7 @@ def test_font():
     epd.fill(white)
     epd.text('Hello',0,20,black)
     epd.text('World',0,40,black)
-    #epd.displayBuffer()
+    #epd.refresh()
     
     #time.sleep(1.5)
     ico = FT2("font/qweather-icons.ttf", render=epd, size=32)
@@ -262,7 +262,7 @@ def test_font():
     
     wqy.drawString(10, 180, 200, 24, ALIGN_LEFT, "文泉驿点阵 16x16") # 你好世界 
     wqyb.drawString(10, 200, 200, 24, ALIGN_LEFT, "文泉驿点阵 16x16 粗体") # 你好世界 
-    epd.displayBuffer()
+    epd.refresh()
 
 def test_image():
     epd = EPD()
@@ -279,7 +279,7 @@ def test_image():
     print(f"w:{ima.width} h:{ima.height}")
     
     ima.draw(epd, 0, 0, 200, 200)
-    epd.displayBuffer()
+    epd.refresh()
     
 if __name__ == "__main__":
     test_font()

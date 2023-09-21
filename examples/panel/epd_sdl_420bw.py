@@ -30,13 +30,8 @@ class EPD(EpdSDLBase, FrameBuffer):
     
     def sleep(self):
         pass
-    
-    def clearBuffer(self, color=0xffff):
-        self.fillBWRam(color)
-        self.updateScreen()
-        pass
-    
-    def displayBuffer(self, buf=None):
+        
+    def refresh(self, buf=None):
         if buf is None:
             buf = self.buf
         self.updateSubWindowBW(buf, 0, 0, self.WIDTH, self.HEIGHT)

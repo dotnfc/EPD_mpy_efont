@@ -25,7 +25,7 @@ def showOffline(epd, font, ssid):
     
     epd.rect(2, 230, 230, 3, BLACK, True)
     epd.drawImage(5, 238, "image/micropython.jpg")
-    epd.displayBuffer()
+    epd.refresh()
 
 def wifi_connect(epd, font, ssid, password):
     wlan = network.WLAN(network.STA_IF)
@@ -33,7 +33,7 @@ def wifi_connect(epd, font, ssid, password):
     
     print("Begin to connect wifi...")
     font.drawString(10, 100, 380, 24, ALIGN_CENTER, f"正在连接 {ssid} ...")
-    epd.displayBuffer()
+    epd.refresh()
     
     wlan.connect(ssid, password)
 
@@ -46,7 +46,9 @@ def wifi_connect(epd, font, ssid, password):
         pass
     
     if wlan.isconnected():
-        print("Wifi connect successful, waitting to get IP...")
+        print("Wifi connect successful")
+        font.drawString(10, 140, 380, 24, ALIGN_CENTER, "已连接")
+        epd.refresh(full=False)
         return True
     else:
         print("Wifi connect failed.")
@@ -71,10 +73,18 @@ def getIcon(weather):
         icon = QW_999
         
     return icon
+    
+def delayStart(n):
+    for _ in range(n):
+        print(".", end="")
+        time.sleep(1)
+    print("")
         
 def main():
     ssid     = "DOTNFC-HOS"
     password = "20180903"
+    
+    delayStart(3)
     
     epd = EpdImage()
     epd.init()
@@ -84,7 +94,7 @@ def main():
     if not wifi_connect(epd, font, ssid, password):
         showOffline(epd, font, ssid)
         epd.deepsleep(15000)
-        
+    
     cityid = "101010100"  
     url = "http://www.tianqiapi.com/api/?version=v6&cityid=" + cityid + "&appid=65251531&appsecret=Yl2bzCYb"
     r = requests.get(url)
@@ -97,8 +107,6 @@ def main():
     font.drawString(10, 135, 400, 24, ALIGN_LEFT, "湿度: %s"%data["humidity"])
     font.drawString(10, 165, 400, 24, ALIGN_LEFT, "温度: %s-%s°"%(data["tem2"], data["tem1"]))
     
-    #image = "image/" + data["wea_img"] + ".jpg" # (xue, lei, shachen, wu, bingbao, yun, yu, yin, qing)
-    #epd.drawImage(190, 166, image)
     ico = getIcon(data["wea_img"])
     ttfIco.drawString(190, 160, 400, 48, ALIGN_LEFT, ico, 32)
         
@@ -107,18 +115,23 @@ def main():
     epd.rect(2, 230, 230, 3, BLACK, True)
     epd.drawImage(5, 238, "image/micropython.jpg")
     
-    epd.displayBuffer()
-    time.sleep(3)
+    epd.refresh()
+    time.sleep(1)
     
     ################################ end ################################
-    gc.collect()
+
     epd.fill(WHITE)
     epd.rect(2, 230, 230, 3, BLACK, True)
     epd.drawImage(5, 238, "image/micropython.jpg")
     font.drawString(10, 10, 400, 32, ALIGN_LEFT, "%s %s"%(data["date"], data["week"]))
-    epd.displayBuffer()
+    epd.refresh()
+    time.sleep(1)
     
-    epd.deepsleep(15000)
+    epd.fill(WHITE)
+    epd.refresh()
+    
+    
+    #epd.deepsleep(15000)
     
 if __name__ == "__main__":
     main()

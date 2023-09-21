@@ -3,7 +3,7 @@ import sys
 if sys.platform == 'linux':
     from panel.epd_sdl_420bw import *
 else:
-    from panel.epd_z96 import *
+    from panel.epd_z98 import *
     
 from efont import *
 import machine
