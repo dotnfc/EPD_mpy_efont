@@ -95,10 +95,6 @@ uint16_t ff2_mpy_drawString(void* ctx, const char *str, int16_t x, int16_t y, bo
 uint16_t ff2_mpy_drawWChar(void* ctx, const wchar_t wchar, int16_t x, int16_t y);
 uint16_t ff2_mpy_drawWString(void* ctx, const wchar_t *wstr, int16_t x, int16_t y, bool is_measure_width);
 
-// font file util
-void efont_register_file_obj(ff2_file_t *stream);
-void efont_unregister_file_obj(ff2_file_t *stream);
-
 #ifdef __cplusplus
 }
 #endif // __cplusplus
