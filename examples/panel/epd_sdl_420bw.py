@@ -4,17 +4,21 @@
 
 from .epd_sdl import * 
 from framebuf import *
+from micropython import const
 
 class FrameBufferEx(FrameBuffer):
     def __init__(self, buf, w, h, mode):
         super().__init__(buf, w, h, mode)
 
-class Epd420BW(EpdSDLBase, FrameBuffer):
+class EPD(EpdSDLBase, FrameBuffer):
+    
+    # Display resolution
+    WIDTH  = const(400)
+    HEIGHT = const(300)
+    BUF_SIZE = const(WIDTH * HEIGHT // 8)
     
     def __init__(self, zoom = 1):
-        self.WIDTH = 400
-        self.HEIGHT = 300
-        self.buf = bytearray(self.WIDTH * self.HEIGHT // 8)
+        self.buf = bytearray(self.BUF_SIZE)
         EpdSDLBase.__init__(self, self.WIDTH, self.HEIGHT, zoom)
         FrameBufferEx.__init__(self, self.buf, self.WIDTH, self.HEIGHT, MONO_HLSB)
         

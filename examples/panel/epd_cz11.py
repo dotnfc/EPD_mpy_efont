@@ -14,7 +14,7 @@ from micropython import const
 from machine import SPI, Pin
 from time import sleep_ms
 from framebuf import *
-import time
+
 
 BUSY = const(1)  # 1=busy, 0=idle
 
@@ -22,7 +22,7 @@ class EPD(FrameBuffer):
     # Display resolution
     WIDTH  = const(400)
     HEIGHT = const(300)
-    BUF_SIZE = const(WIDTH * HEIGHT/8)
+    BUF_SIZE = const(WIDTH * HEIGHT // 8)
     
     def __init__(self):
         self.spi = SPI(2, baudrate=20000000, polarity=0, phase=0, sck=Pin(12), mosi=Pin(11))
@@ -44,12 +44,8 @@ class EPD(FrameBuffer):
         self.rst.init(self.rst.OUT, value=0)
         self.busy.init(self.busy.IN)
         
-        self.self.width = self.self.WIDTH
-        self.height = self.HEIGHT
-
-        self.size = self.self.WIDTH * self.HEIGHT // 8
-        self.buf = bytearray(self.size)
-        super().__init__(self.buf, self.self.WIDTH, self.HEIGHT, GS2_HMSB)
+        self.buf = bytearray(self.BUF_SIZE)
+        super().__init__(self.buf, self.WIDTH, self.HEIGHT, GS2_HMSB)
 
     def _command(self, command, data=None):
         self.cs(1) # according to LOLIN_EPD

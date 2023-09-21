@@ -47,6 +47,7 @@ class EPD(FrameBuffer):
     # Display resolution
     WIDTH  = const(400)
     HEIGHT = const(300)
+    BUF_SIZE = const(WIDTH * HEIGHT // 8)
     
     def __init__(self):
 
@@ -72,8 +73,7 @@ class EPD(FrameBuffer):
         self.width = self.WIDTH
         self.height = self.HEIGHT
 
-        self.size = self.WIDTH * self.HEIGHT // 8
-        self.buf = bytearray(self.size)
+        self.buf = bytearray(self.BUF_SIZE)
         super().__init__(self.buf, self.WIDTH, self.HEIGHT, MONO_HLSB)
         
     LUT_FULL_UPDATE    = bytearray(b'\x80\x60\x40\x00\x00\x00\x00\x10\x60\x20\x00\x00\x00\x00\x80\x60\x40\x00\x00\x00\x00\x10\x60\x20\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x03\x03\x00\x00\x02\x09\x09\x00\x00\x02\x03\x03\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x15\x41\xA8\x32\x30\x0A')

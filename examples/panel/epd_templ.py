@@ -14,7 +14,7 @@ class EPD(FrameBuffer):
     # Display resolution
     WIDTH  = const(400)
     HEIGHT = const(300)
-    BUF_SIZE = const(WIDTH * HEIGHT/8)
+    BUF_SIZE = const(WIDTH * HEIGHT // 8)
     
     def __init__(self):
         self.spi = SPI(2, baudrate=20000000, polarity=0, phase=0, sck=Pin(12), mosi=Pin(11))
@@ -36,12 +36,11 @@ class EPD(FrameBuffer):
         self.rst.init(self.rst.OUT, value=0)
         self.busy.init(self.busy.IN)
         
-        self.self.width = self.self.WIDTH
+        self.width = self.WIDTH
         self.height = self.HEIGHT
 
-        self.size = self.self.WIDTH * self.HEIGHT // 8
-        self.buf = bytearray(self.size)
-        super().__init__(self.buf, self.self.WIDTH, self.HEIGHT, MONO_HLSB)
+        self.buf = bytearray(self.BUF_SIZE)
+        super().__init__(self.buf, self.WIDTH, self.HEIGHT, MONO_HLSB)
 
     def _command(self, command, data=None):
         self.cs(1) # according to LOLIN_EPD

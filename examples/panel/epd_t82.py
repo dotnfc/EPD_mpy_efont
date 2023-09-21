@@ -14,7 +14,7 @@ class EPD(FrameBuffer):
     # Display resolution
     WIDTH  = const(400)
     HEIGHT = const(300)
-    BUF_SIZE = const(WIDTH * HEIGHT/8)
+    BUF_SIZE = const(WIDTH * HEIGHT // 8)
     
     def __init__(self):
         self.spi = SPI(2, baudrate=20000000, polarity=0, phase=0, sck=Pin(12), mosi=Pin(11))

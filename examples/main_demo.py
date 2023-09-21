@@ -1,25 +1,15 @@
 import time
-import network
 import ujson as json
 import urequests as requests
-from epd_z96 import *
+from display import *
 from efont import *
 import gc
-import machine
 from qw_icons import *
 
-BLACK = const(0)
-WHITE = const(1)
-
-class EpdImage(EPD):
-        
-    def __init__(self):
-        EPD.__init__(self)
-        self.image = Image(self.width, self.height)
-    
-    def drawImage(self, x, y, filename):
-        self.image.load(filename, True)
-        self.image.draw(self, x, y)
+try:
+    import network
+except ImportError:
+    import unetwork as network
 
 def showOffline(epd, font, ssid):
     epd.fill(WHITE)
@@ -51,7 +41,7 @@ def wifi_connect(epd, font, ssid, password):
     while not wlan.isconnected():
         time.sleep(0.2)
         count += 1
-        if count > 15:
+        if count > 25:
             break   # time out about 3s
         pass
     
@@ -93,8 +83,7 @@ def main():
     ttfIco = FT2("font/qweather-icons.ttf", render=epd, mono=True, size=32)
     if not wifi_connect(epd, font, ssid, password):
         showOffline(epd, font, ssid)
-        time.sleep(5)
-        # machine.deepsleep(5000)
+        epd.deepsleep(15000)
         
     cityid = "101010100"  
     url = "http://www.tianqiapi.com/api/?version=v6&cityid=" + cityid + "&appid=65251531&appsecret=Yl2bzCYb"
@@ -129,7 +118,7 @@ def main():
     font.drawString(10, 10, 400, 32, ALIGN_LEFT, "%s %s"%(data["date"], data["week"]))
     epd.displayBuffer()
     
-    machine.deepsleep(15000)
+    epd.deepsleep(15000)
     
 if __name__ == "__main__":
     main()
