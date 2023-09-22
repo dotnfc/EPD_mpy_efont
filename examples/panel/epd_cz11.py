@@ -1,8 +1,9 @@
 #-*- coding:utf-8 -*-
-# panel driver
+# panel driver, referenced from GDEW0154T11
 # FPC Label: WFH0420CZ11
 # Panel    : WF0420T1PCZ11
 # IC       : UC8154
+# Product  : Stellar-XL
 # by dotnfc, 2023/09/20
 #----------------------------------------------------------------
 

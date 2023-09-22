@@ -11,7 +11,6 @@ import ujson as json
 import urequests as requests
 from display import *
 from efont import *
-import gc
 from qw_icons import *
 
 try:
