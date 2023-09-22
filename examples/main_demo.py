@@ -1,3 +1,11 @@
+#-*- coding:utf-8 -*-
+#----------------------------------------------------------------
+#
+# demo script for eFont
+#
+# by dotnfc, 2023/06/02
+#
+
 import time
 import ujson as json
 import urequests as requests
@@ -83,8 +91,6 @@ def delayStart(n):
 def main():
     ssid     = "DOTNFC-HOS"
     password = "20180903"
-    
-    delayStart(3)
     
     epd = EpdImage()
     epd.init()

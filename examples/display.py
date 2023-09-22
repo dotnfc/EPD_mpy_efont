@@ -1,3 +1,10 @@
+#-*- coding:utf-8 -*-
+#----------------------------------------------------------------
+#
+# epd with image support, based on frameBuffer
+#
+# by dotnfc, 2023/09/22
+#
 
 import sys
 if sys.platform == 'linux':

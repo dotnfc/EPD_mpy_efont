@@ -1,6 +1,10 @@
 #-*- coding:utf-8 -*-
-# GDEY042Z98 | FPC-191 | SSD1683
-# by dotnfc, 2023/06/02
+#----------------------------------------------------------------
+#
+# panel: GDEY042Z98 | FPC-191 | SSD1683
+#
+# by dotnfc, 2023/09/22
+#
 
 from micropython import const
 from machine import SPI, Pin

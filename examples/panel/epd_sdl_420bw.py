@@ -1,6 +1,9 @@
 #-*- coding:utf-8 -*-
+#----------------------------------------------------------------
+#
 # epd sdl simulator 4.2' (400x300 black and white)
 # by dotnfc, 2023/09/11
+#
 
 from .epd_sdl import * 
 from framebuf import *
@@ -31,7 +34,7 @@ class EPD(EpdSDLBase, FrameBuffer):
     def sleep(self):
         pass
         
-    def refresh(self, buf=None):
+    def refresh(self, buf=None, full=True):
         if buf is None:
             buf = self.buf
         self.updateSubWindowBW(buf, 0, 0, self.WIDTH, self.HEIGHT)

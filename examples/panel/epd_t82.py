@@ -1,6 +1,10 @@
 #-*- coding:utf-8 -*-
-# GDEQ0426T82 panel driver
+#----------------------------------------------------------------
+#
+# panel: GDEQ0426T82 panel driver
+#
 # by dotnfc, 2023/09/20
+#
 
 from micropython import const
 from machine import SPI, Pin
