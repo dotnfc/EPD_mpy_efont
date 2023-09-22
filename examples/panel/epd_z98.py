@@ -10,13 +10,9 @@ from micropython import const
 from machine import SPI, Pin
 from time import sleep_ms
 from framebuf import *
+from .epd_log import *
 
 BUSY = const(1)  # 1=busy, 0=idle
-
-def dprint(*args, **kwargs):
-    should_print = True
-    if should_print:
-        print(*args, **kwargs)
         
 class EPD(FrameBuffer):
     # Display resolution
@@ -181,13 +177,13 @@ class EPD(FrameBuffer):
         
     def reset(self):
         self.rst(1)
-        sleep_ms(1)
+        sleep_ms(10)
 
         self.rst(0)
         sleep_ms(10)
 
-        self.rst(1)
-        
+        self.rst(1)    
+    
     # specify the memory area for data R/W
     def set_memory_area(self, x_start, y_start, x_end, y_end):
         self._command(0x11); # set ram entry mode
@@ -228,13 +224,7 @@ def main():
     epd.text('Hello world', 10, 60, 0)
     epd.refresh()
     time.sleep(1)
-    
-    # epd.fill(1)
-    # epd.text('i am dotnfc', 10, 160, 0)
-    # epd.refresh()
-    # time.sleep(1)
-    
-    #epd.fill(1)
+
     epd.text('dotnfc here', 0, 10, 0)
     epd.refresh(full=False)
     

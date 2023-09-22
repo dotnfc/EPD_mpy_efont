@@ -4,9 +4,10 @@
 
 # https://wiki.libsdl.org/SDL_CreateRenderer
 
-from usdl2 import *
-import array
 import time
+import array
+from usdl2 import *
+from micropython import const
 
 # import os
 # os.chdir('/home/dotnfc/mpy_home')
