@@ -43,10 +43,10 @@ extern "C" {
 //
 // memory porting
 // 
-#define ft_smalloc  malloc // m_malloc
-#define ft_scalloc  calloc // m_malloc	
-#define ft_srealloc realloc  // m_realloc
-#define ft_sfree    free // m_free
+#define ft_smalloc  malloc  // m_malloc
+#define ft_scalloc  calloc  // m_malloc	
+#define ft_srealloc realloc // m_realloc
+#define ft_sfree    free    // m_free
 
 //
 // filesystem porting
@@ -75,6 +75,8 @@ long int ff2_ftell(ff2_file_t *stream);
 
 // helper 
 typedef void * ff2_handler;
+
+void*    ff2_mpy_reset_mp_file_obj(void *ctx, void *file_obj);
 void*    ff2_mpy_get_mp_file_obj(void *ctx);
 void*    ff2_mpy_loadFont(const char *file, void *old_ctx);
 void     ff2_mpy_unloadFont(void *ctx);

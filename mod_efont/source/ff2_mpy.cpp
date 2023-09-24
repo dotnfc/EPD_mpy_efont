@@ -22,6 +22,8 @@
 #include <string>
 
 
+#define FF2M_DMSG(...)   // mp_printf(&mp_plat_print, "[ff2m] " __VA_ARGS__)
+
 #define INIT_MAGIC (uint16_t)0x55AA
 
 typedef struct _ff2_rect_t
@@ -105,6 +107,22 @@ void* ff2_mpy_get_mp_file_obj(void *ctx)
         return NULL;
     
     return file->file_obj;
+}
+
+void* ff2_mpy_reset_mp_file_obj(void *ctx, void *file_obj)
+{
+    ff2_context_p pctx = (ff2_context_p)ctx;
+    if(pctx == NULL) 
+        return NULL;
+    
+    // see ff2_mpy_system.c | FT_Stream_Open()
+    ff2_file_t *file = (ff2_file_t *)pctx->g_FtLibrary->memory->user;
+    if(file == NULL)
+        return NULL;
+    
+    void* p = file->file_obj;
+    file->file_obj = file_obj;
+    return p;
 }
 
 void *ff2_mpy_loadFont(const char *file, void *old_ctx)
@@ -243,6 +261,9 @@ int16_t ff2_mpy_getLineHeight(void *ctx)
 
 uint16_t ff2_mpy_getTextWidth(void *ctx, const char *text)
 {
+    void *p = ff2_mpy_get_mp_file_obj(ctx);
+    FF2M_DMSG("file_obj => %p\n", p);
+
     return ff2_mpy_drawString(ctx, text, 0, 0, true);
 }
 

@@ -37,6 +37,7 @@
 #include "modefont.h"
 #include "image_mpy.h"
 
+#define EFONT_DMSG(...)   // mp_printf(&mp_plat_print, "[efm] " __VA_ARGS__)
 
 // class FT2(object):
 typedef struct _mp_obj_FT2_t
@@ -108,7 +109,7 @@ STATIC mp_obj_t mod_efont_FT2_make_new(const mp_obj_type_t *type, size_t n_args,
     self->bold = args[ARG_bold].u_bool;
     self->italic = args[ARG_italic].u_bool;
 
-    mp_printf(&mp_plat_print, "efont new %s: %p, %p\n", font_file, self->hff2, self->hfont);
+    EFONT_DMSG("new %s => %p, font_obj = %p\n", font_file, self->hff2, self->hfont);
 
     // a render with method setPixel(x, y, c) routine, aka framebuf
     mp_obj_t render = mp_const_none;
@@ -179,6 +180,10 @@ STATIC mp_obj_t mod_efont_FT2_drawString(size_t n_args, const mp_obj_t *args_in)
         self->size = mp_obj_get_int(args_in[7]);
         ff2_mpy_setSize(self->hff2, self->size);
     }
+
+    EFONT_DMSG("draw %p, font_obj = %p\n", self->hff2, self->hfont);
+    ff2_mpy_reset_mp_file_obj(self->hff2, self->hfont);
+
     // GET_STR_DATA_LEN(text, str, str_len);
     //  mp_print_str(MPY_PLAT_PRNT, text);
     uint16_t nx = 0;
@@ -247,6 +252,17 @@ STATIC mp_obj_t mod_efont_FT2_unload(mp_obj_t self_in)
     return mp_const_none;
 }
 STATIC MP_DEFINE_CONST_FUN_OBJ_1(mod_efont_FT2_unload_obj, mod_efont_FT2_unload);
+
+// def FT2.getFile(self)
+//@Unload font and free resources
+//
+STATIC mp_obj_t mod_efont_FT2_getFile(mp_obj_t self_in)
+{
+    mp_obj_FT2_t *self = MP_OBJ_TO_PTR(self_in);
+
+    return MP_OBJ_FROM_PTR(self->hfont);
+}
+STATIC MP_DEFINE_CONST_FUN_OBJ_1(mod_efont_FT2_getFile_obj, mod_efont_FT2_getFile);
 
 // FT2 attr mono
 STATIC mp_obj_t mod_efont_FT2_attr_mono(mp_obj_t self_in, mp_obj_t dest, mp_obj_t attr)
@@ -366,6 +382,7 @@ STATIC const mp_rom_map_elem_t mod_efont_FT2_locals_dict_table[] = {
     {MP_ROM_QSTR(MP_QSTR_getStringWidth), MP_ROM_PTR(&mod_efont_FT2_getStringWidth_obj)},
     {MP_ROM_QSTR(MP_QSTR_setSize), MP_ROM_PTR(&mod_efont_FT2_setSize_obj)},
     {MP_ROM_QSTR(MP_QSTR_unload), MP_ROM_PTR(&mod_efont_FT2_unload_obj)},
+    {MP_ROM_QSTR(MP_QSTR_getFile), MP_ROM_PTR(&mod_efont_FT2_getFile_obj)},
 };
 STATIC MP_DEFINE_CONST_DICT(mod_efont_FT2_locals_dict, mod_efont_FT2_locals_dict_table);
 

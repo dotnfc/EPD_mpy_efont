@@ -1,7 +1,7 @@
 #-*- coding:utf-8 -*-
 #----------------------------------------------------------------
 #
-# panel: GDEQ0426T82 panel driver
+# panel: GDEQ0426T82 | SSD1677
 #
 # by dotnfc, 2023/09/20
 #
@@ -11,6 +11,8 @@ from machine import SPI, Pin
 from time import sleep_ms
 from framebuf import *
 import time
+from logger import *
+from board import *
 
 BUSY = const(1)  # 1=busy, 0=idle
 
@@ -21,19 +23,13 @@ class EPD(FrameBuffer):
     BUF_SIZE = const(WIDTH * HEIGHT // 8)
     
     def __init__(self):
-        self.spi = SPI(2, baudrate=20000000, polarity=0, phase=0, sck=Pin(12), mosi=Pin(11))
-        #self.spi = SPI(1, 10000000, sck=Pin(14), mosi=Pin(13), miso=Pin(12))
+        self.spi = SPI(2, baudrate=20000000, polarity=0, phase=0, sck=EPD_PIN_SCK, mosi=EPD_PIN_SDA)
         self.spi.init()
-
-        dc = Pin(14)
-        cs = Pin(13)
-        rst  = Pin(21)
-        busy = Pin(47)
         
-        self.cs = cs
-        self.dc = dc
-        self.rst = rst
-        self.busy = busy
+        self.cs = EPD_PIN_CS
+        self.dc = EPD_PIN_DC
+        self.rst = EPD_PIN_RST
+        self.busy = EPD_PIN_BUSY
         
         self.cs.init(self.cs.OUT, value=1)
         self.dc.init(self.dc.OUT, value=0)

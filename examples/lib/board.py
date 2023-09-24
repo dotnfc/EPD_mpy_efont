@@ -1,0 +1,46 @@
+#-*- coding:utf-8 -*-
+#----------------------------------------------------------------
+#
+# board config
+#
+# by dotnfc, 2023/09/22
+#
+from micropython import const
+from machine import Pin
+
+# led
+LED_BLUE     = Pin(4)
+
+# buzzer
+BUZZER       = Pin(10)
+
+# epd io
+EPD_PIN_CS   = Pin(13)
+EPD_PIN_SCK  = Pin(12)
+EPD_PIN_SDA  = Pin(11)
+
+EPD_PIN_CS2  = Pin(48)
+
+EPD_PIN_DC   = Pin(14)
+EPD_PIN_RST  = Pin(21)
+EPD_PIN_BUSY = Pin(47)
+
+# button
+KEY_IO0      = Pin(0)
+KEY_USER     = Pin(8)
+
+# battery
+BATTERY_ADC  = Pin(1)
+BATTERY_ADC_EN= Pin(2)
+
+# temperature sensor
+SENSOR_EN   = Pin(1)
+SENSOR_SCL  = Pin(39)
+SENSOR_SDA  = Pin(38)
+
+# nfc tag
+NFC_TAG_NSS = Pin(17)
+NFC_TAG_IRQ = Pin(6)
+NFC_TAG_SCL = Pin(16)
+NFC_TAG_SDA = Pin(15)
+
