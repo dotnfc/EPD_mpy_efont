@@ -28,7 +28,6 @@ class EPD(FrameBuffer):
     BUF_SIZE = const(WIDTH * HEIGHT // 8)
     
     def __init__(self):
-
         self.spi = SPI(2, baudrate=20000000, polarity=0, phase=0, sck=EPD_PIN_SCK, mosi=EPD_PIN_SDA)
         self.spi.init()
         
@@ -223,9 +222,12 @@ class EPD(FrameBuffer):
         sleep_ms(100)
         self.wait_until_idle()
         
-    def wait_until_idle(self):
+    def wait_until_idle(self, timeout=4000):
             while self.busy.value() == BUSY:
                 sleep_ms(100)
+                timeout = timeout - 100
+                if timeout <=0 :
+                    raise RuntimeError("Timeout out for waiting busy signal")
 
     def reset(self):
         self.rst(1)
@@ -235,6 +237,7 @@ class EPD(FrameBuffer):
         sleep_ms(10)
 
         self.rst(1)
+        sleep_ms(10)
 
     # specify the memory area for data R/W
     def set_memory_area(self, x_start, y_start, x_end, y_end):
