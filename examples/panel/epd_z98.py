@@ -221,7 +221,11 @@ def main():
     time.sleep(1)
 
     epd.text('dotnfc here', 0, 10, 0)
+    
+    _start = time.ticks_ms()
     epd.refresh(full=False)
+    _stop = time.ticks_ms()
+    print("time used: %d ms" % (_stop - _start))
     
     epd.sleep()
 
