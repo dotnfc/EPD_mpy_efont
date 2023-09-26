@@ -74,13 +74,16 @@ class EPD(FrameBuffer):
         self._command(0x02)
         self.wait_until_idle()
     
-    def refresh(self):
+    def refresh(self, buf = None, full=True):
         '''Update screen contents.
         
         Args:
-            - buf: the display contents to screen, can be none to use internal buffer
-            - full: whether to update the entire screen, or just the partial of it
+            - buf: dummy, only internal buffer
+            - full: dummy, only full more
         '''
+        if not full:
+            return
+        
         self._command(0x10)
         data = []
         for i in range(0, self.BUF_SIZE):
@@ -121,21 +124,21 @@ class EPD(FrameBuffer):
 
         #  release flash sleep
         self._command(0x65, b'\x01')     # FLASH CONTROL
-        self._command(0xAB)
-        self._command(0X65, b'\x00')     # FLASH CONTROL
+        self._command(0xab)
+        self._command(0x65, b'\x00')     # FLASH CONTROL
         
-        self._command(0x01, b'\x37\x00')
-        self._command(0x00, b'\xCF\x08')
-        self._command(0x06, b'\xC7\xCC\x28')
-        self._command(0x04)
+        self._command(0x01, b'\x37\x00') # POWER_SETTING
+        self._command(0x00, b'\xcf\x08') # PANEL_SETTING
+        self._command(0x06, b'\xC7\xCC\x28') # BOOSTER_SOFT_START
+        self._command(0x04)              # POWER_ON
         self.wait_until_idle()
-        self._command(0x30, b'\x3C')
+        self._command(0x30, b'\x3C')     # PLL_CONTROL
         self._command(0x41, b'\x00')
         self._command(0x50, b'\x77')
         self._command(0x60, b'\x22')
         self._command(0x61, ustruct.pack(">HH", self.WIDTH, self.HEIGHT))
-        self._command(0x82, b'\x1E') # decide by LUT file
-        self._command(0xE5, b'\x03')
+        self._command(0x82, b'\x1E')     # decide by LUT file
+        self._command(0xE5, b'\x03')     # FLASH MODE
         
     def init_full(self):
         self.init_panel()

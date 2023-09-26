@@ -179,7 +179,6 @@ def main():
     print("fill used: %d ms" % (_stop - _start))
     epd.text('Hello world', 10, 60, red)
     epd.line(0, 10, 380, 10, 0)
-
     
     _start = time.ticks_ms()
     epd.display_frame()
