@@ -61,7 +61,18 @@ The parameter after -s should preferably match the size of the vfs partition in 
 ## 5. Build efont
 Please refer to [build.md](docs/build.md)
 
+## 6. How to test Script
+Please refer to [Running your first script](https://docs.micropython.org/en/latest/pyboard/tutorial/script.html). there is a main.py is the entry script on the target board, or we can run script from the repl mode.
 
+For the PC enviroment, we can use mpremote, rshell, ... to get REPL, run a script, manage the vfs contents and so on.
+
+For an IDE，[RT-Thread Micropython IDE for VSCode](https://marketplace.visualstudio.com/items?itemName=RT-Thread.rt-thread-micropython) may be a good choice.
+
+And the unix port, its default heap size is too small for 3c 10.2' examples, we can do:
+
+```shell
+mpy -X heapsize=8m page/uiDay.py
+```
 <hr>
 
 ## <span style="color:red;">NOTE</span>

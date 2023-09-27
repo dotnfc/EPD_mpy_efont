@@ -70,6 +70,11 @@ wget -O ~/.local/bin/mkfatfs https://github.com/labplus-cn/mkfatfs/releases/down
 
 对于脚本开发，[RT-Thread Micropython IDE for VSCode](https://marketplace.visualstudio.com/items?itemName=RT-Thread.rt-thread-micropython) 不错。
 
+对于 unix port，默认 heap 可能不足以运行 10.2' 的例子，可以这样:
+
+```shell
+mpy -X heapsize=8m page/uiDay.py
+```
 <hr>
 
 ## <span style="color:red;">注意</span>
