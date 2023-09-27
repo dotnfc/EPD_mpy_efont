@@ -18,7 +18,7 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "/home/dotnfc/mpy/EPD_mpy_efont/micropython/ports/unix/build-standard/micropython",
-            "args": ["epd_sdl_test.py"],
+            "args": ["-X", "heapsize=16m", "main_demo_3c.py"],
             "stopAtEntry": false,
             "miDebuggerArgs": "",
             "cwd": "/home/dotnfc/mpy/EPD_mpy_efont/examples/",

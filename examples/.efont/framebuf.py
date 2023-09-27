@@ -43,9 +43,6 @@ class FrameBuffer:
         '''
         pass
 
-    def fill_rect():
-        pass
-
     def vline(x, y, h, c):
         pass
     
