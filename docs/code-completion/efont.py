@@ -19,20 +19,26 @@ class FT2(object):
              mono: bool = False,
              bold: bool = False,
              italic: bool = False):
-        ''' 
-        @brief Load font from file(.ttf, .pcf)
-        @param file, file path to load
-        @param render, an instance of framebuf.FrameBuffer which pixel() method will be called when self.drawString()
-        @param size, default size to draw text
-        @param mono, true for loading as mono font for EPD
-        @param bold, bold style to draw text
-        @param italic, italic style to draw text
-        @return True if font was loaded
-        '''
+        """Load font from file(.ttf, .pcf).
+        
+        Args:
+            file: file path to load.
+            render: an instance of framebuf.FrameBuffer which pixel() method will be called when drawString().
+            size: default size to draw text
+            mono: true for loading as mono font for EPD
+            bold: bold style to draw text
+            italic: italic style to draw text
+            
+        Returns:
+            return True if font was loaded
+        
+        Raises:
+            Error - raises an exception
+        """
         pass
     
     def unload(self):
-        '''@Unload font and free resources
+        '''Unload font and free resources.
         '''
         pass
     
@@ -44,54 +50,62 @@ class FT2(object):
                align: int = 0,
                text: str = "",
                size: int = 16) -> int:
-        '''
-        @brief draw text string
-        @param x, x coordinate of text drawing box
-        @param y, y coordinate of text drawing box
-        @param w, width of text drawing box
-        @param h, height of text drawing box
-        @param align, alignment of text, ALIGN_LEFT, ALIGN_CENTER, ALIGN_RIGHT
-        @param text, text to draw
-        @param size, optional size to draw text
-        @return next x coordinate after drawing
-        '''
-        pass
-    
-    def getStringWidth(self, 
-                text : str) -> int:
-        '''
-        @brief get text width when drawing
-        @param text, text for measurement
-        @return text width
+        '''Draw text string.
+        
+        Args:
+            x: x coordinate of text drawing box
+            y: y coordinate of text drawing box
+            w: width of text drawing box
+            h: height of text drawing box
+            align: alignment of text, ALIGN_LEFT, ALIGN_CENTER, ALIGN_RIGHT
+            text: text to draw
+            size: optional size to draw text
+            
+        Return:
+            next x coordinate after drawing
         '''
         pass
     
-    def setSize(self, 
-                size: int):
+    def getStringWidth(self, text : str) -> int:
+        '''Get text width when drawing.
+        
+        Args:
+            text: text for measurement
+        
+        Return:
+            text width
         '''
-        @briefset font size to draw
-        @param size, to modify
+        pass
+    
+    def setSize(self, size: int):
+        '''Set font size to draw.
+        
+        Args:
+            Size, to modify
         '''
         pass
     
 class Image(object):
-    """
-    PNG, JPG Wrapper Class
+    """PNG, JPG Wrapper Class
     """
     
     def __init__(width: int, height: int):
         '''
-        @param width, height: container width and height when drawing
+        Args:
+            width, height: container width and height when drawing
         '''
         pass
 
     def load(self, file : str, 
-        mono : bool = False):
-        '''
-        @brief Load image from file(.png, .jpg)
-        @param file, file path to load
-        @param mono, load as mono image for EPD
-        @return loaded image (width, height)
+            mono : bool = False):
+        '''Load image from file(.png, .jpg).
+        
+        Args:
+            file: file path to load
+            mono: load as mono image for EPD
+        
+        Return:
+            loaded image (width, height)
         '''
         pass
     
@@ -100,17 +114,17 @@ class Image(object):
             x : int = 0, 
             y : int = 0, 
             unload : bool = True):
-        '''
-        @brief render image at(render, x, y)
-        @param render, the container to render, must be a FrameBuffer (derived) instance
-        @param x, y, left-top pos to draw
-        @param unload, free image resource after drawing automatically.
+        '''Render image at(render, x, y).
+        
+        Args:
+            render: the container to rend, must be a FrameBuffer (derived) instance
+            x, y: left-top position to draw
+            unload: free image resources after drawing automatically.
         '''
         pass
     
     def unload(self):
-        '''
-        @brief Unload image, free image resource
+        '''Unload image, free image resource.
         '''
         pass
 

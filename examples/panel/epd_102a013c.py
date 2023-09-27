@@ -16,19 +16,26 @@ from logger import *
 from board import *
 import ustruct
 
+
+
 BUSY = const(1)  # 1=busy, 0=idle
+
 class EPD(FrameBuffer):
     # Display resolution
     WIDTH  = const(960)
     HEIGHT = const(640)
     BUF_SIZE = const(WIDTH * HEIGHT // 8)
-    
-    # working mode
-    COLOR_MODE_2C = const(1) # black, white
-    COLOR_MODE_3C = const(2) # black, white, red
-    
+
+    # RAM Black(0) & White(1)
+    RBW_BLACK = const(0)
+    RBW_WHITE = const(1)
+
+    # RAM Red(1) & White(0)
+    RRW_RED = const(1)
+    RRW_WHITE = const(0)
+
     def __init__(self):
-        self.spi = SPI(2, baudrate=2000000, polarity=0, phase=0, sck=EPD_PIN_SCK, mosi=EPD_PIN_SDA)
+        self.spi = SPI(2, baudrate=10000000, polarity=0, phase=0, sck=EPD_PIN_SCK, mosi=EPD_PIN_SDA)
         self.spi.init()
         
         self.cs = EPD_PIN_CS
@@ -40,10 +47,6 @@ class EPD(FrameBuffer):
         self.dc.init(self.dc.OUT, value=0)
         self.rst.init(self.rst.OUT, value=0)
         self.busy.init(self.busy.IN)
-                
-        self.BLACK = 0x0
-        self.WHITE = 0xf
-        self.RED = 0x5
 
         self.buf_bw = bytearray(self.BUF_SIZE)
         self.buf_rw = bytearray(self.BUF_SIZE)
@@ -106,7 +109,6 @@ class EPD(FrameBuffer):
     
     def init(self):
         self.reset()
-        
         self.init_3c()
     
     def refresh(self, buf = None, full=True):
@@ -157,13 +159,9 @@ class EPD(FrameBuffer):
         sleep_ms(30)
         
     def sleep(self):
-        # self.power_off()        
-        self._command(0x10, 0x03)
+        self._command(0x10, 0x03) # Enter Deep Sleep Mode
         
 def main():
-    BLACK = 0
-    RED = 1
-    WHITE = 1
     epd = EPD()
     
     _start = time.ticks_ms()
@@ -171,13 +169,12 @@ def main():
     _stop = time.ticks_ms()
     print("init used: %d ms" % (_stop - _start))
     
-    epd.fill(WHITE)
-    epd.text('Hello world! i am black color', 10, 20, BLACK)
-    epd.line(0, 10, 380, 10, BLACK)
+    epd.fill(RBW_WHITE)
+    epd.text('Hello world! i am black color', 10, 20, RBW_BLACK)
+    epd.line(0, 10, 380, 10, RBW_BLACK)
     
-    
-    epd.fb_rw.text('Hello world! i am red color', 10, 120, RED)
-    epd.fb_rw.line(0, 110, 380, 110, RED)
+    epd.fb_rw.text('Hello world! i am red color', 10, 120, RRW_RED)
+    epd.fb_rw.line(0, 110, 380, 110, RRW_RED)
     
     epd.refresh()
     

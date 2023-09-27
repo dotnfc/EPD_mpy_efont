@@ -41,7 +41,6 @@ class EpdSDLBase():
         self._renderer = SDL_CreateRenderer(self._window, -1, SDL_RENDERER_ACCELERATED)
         self._texture = SDL_CreateTexture(self._renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, self._w, self._h)
 
-            
     async def async_refresh(self):
         ref_evt = array.array("P", [0])
         
@@ -164,7 +163,7 @@ class EpdSDLBase():
                     color = SDL_WHITE  # default white, in 0xAARRGGBB format
                     if c_bw & 0x80:
                         color = SDL_BLACK # black
-                    if c_rw & 0x80:
+                    elif c_rw & 0x80:
                         color = SDL_RED   # red
                     else:
                         color = SDL_WHITE # white

@@ -86,8 +86,9 @@ class EPD(FrameBuffer):
         
         self._command(0x10)
         data = []
+        ba_ref = self.buf
         for i in range(0, self.BUF_SIZE):
-            temp1 = self.buf[i] # bit-order: GS2_HMSB
+            temp1 = ba_ref[i] # bit-order: GS2_HMSB
             # temp1 = self.msb_to_lsb(self.buf[i])
             j = 0
             while (j < 4):

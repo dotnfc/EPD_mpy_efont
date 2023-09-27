@@ -15,6 +15,7 @@
 #include "ff2_mpy.h"
 #include <ctype.h>
 
+#define MAKE_MP_INT(NUMBER)         mp_obj_new_int(NUMBER)
 #define IMAGE_BUF_SIZE (4 * 1024)
 #define ASSERT_BUF_PTR(BUF, MSG) \
     if (BUF == NULL)             \
@@ -38,6 +39,9 @@ typedef struct _IMA_IO
     mp_fun_var_t fbuf_pixel_method; // destination FrameBuffer pixel() method to invoke
     mp_obj_t dst_fbuf;              // destination FrameBuffer instance
     mp_obj_t src_fbuf;              // source FrameBuffer instance, aka JPG/PNG decoded frame
+
+    bool mono;       // true if target fbuf is monochrome
+    uint16_t fg, bg; // when mono is true, map color to draw
 } IMA_IO;
 
 // Match definition to modframebuf.c
@@ -60,17 +64,19 @@ typedef struct _mp_obj_framebuf_t
 
 
 static mp_obj_t image_mpy_framebuf_new(const mp_obj_type_t *type, void *data, uint16_t w, uint16_t h, uint8_t format);
-static bool image_mpy_blit(IMA_IO *imaIo, int32_t x, int32_t y, int32_t fgcol, int32_t bgcol);
+static bool image_mpy_blit(IMA_IO *imaIo, int32_t x, int32_t y);
 static bool image_mpy_create_source(JDEC *jdec, int32_t cx, int32_t cy);
 static void image_mpy_update_source(JDEC *jdec, uint8_t *buf, int32_t w, int32_t h);
 
 static bool isImageFile(const char *filename, const char *ext);
 
 static void *image_mpy_init_dest_fbuf(image_handle_t hima);
-static image_handle_t image_mpy_load_jpg(const char *filename, uint16_t *w, uint16_t *h);
-static image_handle_t image_mpy_load_png(const char *filename, uint16_t *w, uint16_t *h);
-static bool image_mpy_draw_jpg(image_handle_t hima, bool cropping, void *fbuf, int32_t l, int32_t t, int32_t r, int32_t b);
-static bool image_mpy_draw_png(image_handle_t hima, bool cropping, void *fbuf, int32_t l, int32_t t, int32_t r, int32_t b);
+static image_handle_t image_mpy_load_jpg(const char *filename, uint16_t *w, uint16_t *h, bool is_mono);
+static image_handle_t image_mpy_load_png(const char *filename, uint16_t *w, uint16_t *h, bool is_mono);
+static bool image_mpy_draw_jpg(image_handle_t hima, bool cropping, void *fbuf, int32_t l, int32_t t, int32_t r, int32_t b, 
+                                uint16_t fg, uint16_t bg);
+static bool image_mpy_draw_png(image_handle_t hima, bool cropping, void *fbuf, int32_t l, int32_t t, int32_t r, int32_t b, 
+                                uint16_t fg, uint16_t bg);
 static bool image_mpy_unload_jpg(image_handle_t hima);
 static bool image_mpy_unload_png(image_handle_t hima);
 static void image_mpy_set_fbuf_info_jpg(image_handle_t hima, uint16_t width, uint16_t height);
@@ -114,7 +120,7 @@ STATIC int jpg_out( // 1:Ok, 0:Aborted
     IMA_IO *imaIo = (IMA_IO *)jd->device;
 
     image_mpy_update_source(jd, bitmap, rect->right - rect->left + 1, rect->bottom - rect->top + 1);
-    image_mpy_blit(imaIo, imaIo->left + rect->left, imaIo->top + rect->top, 1, 0);
+    image_mpy_blit(imaIo, imaIo->left + rect->left, imaIo->top + rect->top);
 
     return 1; /* Continue to decompress */
 }
@@ -132,12 +138,12 @@ STATIC int jpg_out_cropping( // 1:Ok, 0:Aborted
         imaIo->bottom >= rect->top)
     {
         image_mpy_update_source(jd, bitmap, rect->right - rect->left + 1, rect->bottom - rect->top + 1);
-        image_mpy_blit(imaIo, imaIo->left + rect->left, imaIo->top + rect->top, 1, 0);
+        image_mpy_blit(imaIo, imaIo->left + rect->left, imaIo->top + rect->top);
     }
     return 1; // Continue to decompress
 }
 
-image_handle_t image_mpy_load_jpg(const char *filename, uint16_t *w, uint16_t *h)
+image_handle_t image_mpy_load_jpg(const char *filename, uint16_t *w, uint16_t *h, bool is_mono)
 {
     JRESULT res;
     IMA_IO *imaIo;
@@ -154,6 +160,10 @@ image_handle_t image_mpy_load_jpg(const char *filename, uint16_t *w, uint16_t *h
 
     imaIo->fp = ff2_fopen(filename, "rb");
 
+    imaIo->mono = is_mono;
+    imaIo->fg = 1;
+    imaIo->bg = 0;
+
     // Prepare to decompress
     res = jd_prepare(jdec, file_in_func, imaIo->work_buf, IMAGE_BUF_SIZE, imaIo);
     if (res == JDR_OK)
@@ -168,7 +178,9 @@ image_handle_t image_mpy_load_jpg(const char *filename, uint16_t *w, uint16_t *h
     MP_RAISE_ERROR("unsupported image file");
 }
 
-bool image_mpy_draw_jpg(image_handle_t hima, bool cropping, void *fbuf, int32_t l, int32_t t, int32_t r, int32_t b)
+bool image_mpy_draw_jpg(image_handle_t hima, bool cropping, void *fbuf, 
+                        int32_t l, int32_t t, int32_t r, int32_t b, 
+                        uint16_t fg, uint16_t bg)
 {
     JRESULT res;
     JDEC *jdec = (JDEC *)hima;
@@ -178,6 +190,8 @@ bool image_mpy_draw_jpg(image_handle_t hima, bool cropping, void *fbuf, int32_t 
     imaIo->top = t;
     imaIo->right = r;
     imaIo->bottom = b;
+    imaIo->bg = bg;
+    imaIo->fg = fg;
 
     // check for canvas is within the dest_fbuf
     if (imaIo->right > imaIo->dst_fbuf_width)
@@ -229,7 +243,6 @@ void image_mpy_set_fbuf_info_jpg(image_handle_t hima, uint16_t width, uint16_t h
 // PNG Routines using the pngle library from https://github.com/kikuchan/pngle
 // licensed under the MIT License
 //
-
 #define MAP_RGB565(R, G, B)         (uint16_t) ((R & 0xF8) << 8) | ((G & 0xFC) << 3) | ((B & 0xF8) >> 3)
 #define MAP_MONO(R, G, B)           (uint8_t)  ((R * 77 + G * 151 + B * 28) >> 8)
 void image_mpy_draw_pngle(pngle_t *pngle, uint32_t x, uint32_t y, uint32_t w, uint32_t h, uint8_t rgba[4])
@@ -244,15 +257,25 @@ void image_mpy_draw_pngle(pngle_t *pngle, uint32_t x, uint32_t y, uint32_t w, ui
     }
 
     // dest.pixel(cx0, y0, bgcol/fgcol)
-    args_setpixel[1] = MP_OBJ_NEW_SMALL_INT(x + imaIo->left);
-    args_setpixel[2] = MP_OBJ_NEW_SMALL_INT(y + imaIo->top);
-    uint8_t color = MAP_MONO(rgba[0], rgba[1], rgba[2]);
-    // uint16_t color = (MAP_RGB565(rgba[0], rgba[1], rgba[2]));
-    args_setpixel[3] = MP_OBJ_NEW_SMALL_INT((color >= 192) ? 1 : 0);
+    args_setpixel[1] = MAKE_MP_INT(x + imaIo->left);
+    args_setpixel[2] = MAKE_MP_INT(y + imaIo->top);
+
+    mp_obj_t ocolor;
+    if (imaIo->mono)
+    {
+        uint16_t color = MAP_MONO(rgba[0], rgba[1], rgba[2]);
+        ocolor = MP_OBJ_NEW_SMALL_INT((color >= 192) ? imaIo->fg : imaIo->bg);
+    }
+    else
+    {
+        ocolor = MAKE_MP_INT (MAP_RGB565(rgba[0], rgba[1], rgba[2]));
+    }
+    
+    args_setpixel[3] = ocolor;
     mp_call_function_n_kw(imaIo->fbuf_pixel_method, 4, 0, args_setpixel);
 }
 
-image_handle_t image_mpy_load_png(const char *filename, uint16_t *w, uint16_t *h)
+image_handle_t image_mpy_load_png(const char *filename, uint16_t *w, uint16_t *h, bool is_mono)
 {
     IMA_IO *imaIo = m_malloc(sizeof(IMA_IO));
     ASSERT_BUF_PTR(imaIo, "failed to alloc png io");
@@ -264,6 +287,10 @@ image_handle_t image_mpy_load_png(const char *filename, uint16_t *w, uint16_t *h
     ASSERT_BUF_PTR(imaIo->hpng, "failed to alloc jpg work buffer");
 
     imaIo->fp = ff2_fopen(filename, "rb");
+    
+    imaIo->mono = is_mono;
+    imaIo->fg = 1;
+    imaIo->bg = 0;
 
     char buf[64];
     int len = ff2_fread(buf, sizeof(buf), 1, imaIo->fp);
@@ -284,7 +311,10 @@ image_handle_t image_mpy_load_png(const char *filename, uint16_t *w, uint16_t *h
     return imaIo;
 }
 
-bool image_mpy_draw_png(image_handle_t hima, bool cropping, void *fbuf, int32_t l, int32_t t, int32_t r, int32_t b)
+
+bool image_mpy_draw_png(image_handle_t hima, bool cropping, void *fbuf, 
+                        int32_t l, int32_t t, int32_t r, int32_t b, 
+                        uint16_t fg, uint16_t bg)
 {
     IMA_IO *imaIo = (IMA_IO *)hima;
 
@@ -292,6 +322,8 @@ bool image_mpy_draw_png(image_handle_t hima, bool cropping, void *fbuf, int32_t 
     imaIo->top = t;
     imaIo->right = r;
     imaIo->bottom = b;
+    imaIo->bg = bg;
+    imaIo->fg = fg;
 
     // check for canvas is within the dest_fbuf
     if (imaIo->right > imaIo->dst_fbuf_width)
@@ -397,7 +429,7 @@ void image_mpy_set_fbuf_info_png(image_handle_t hima, uint16_t width, uint16_t h
  * @param monochrome draw image as monochrome or RGB565
  * @return the image handle or NULL if failed.
  */
-image_handle_t image_mpy_load(const char *filename, uint16_t *w, uint16_t *h, int8_t *ima_type)
+image_handle_t image_mpy_load(const char *filename, uint16_t *w, uint16_t *h, int8_t *ima_type, bool is_mono)
 {
     bool isPng = isImageFile(filename, "png");
     bool isJpg = isImageFile(filename, "jpg");
@@ -406,12 +438,12 @@ image_handle_t image_mpy_load(const char *filename, uint16_t *w, uint16_t *h, in
     if (isPng)
     {
         *ima_type = IMAGE_PNG;
-        return image_mpy_load_png(filename, w, h);
+        return image_mpy_load_png(filename, w, h, is_mono);
     }
     else if (isJpg || isJpeg)
     {
         *ima_type = IMAGE_JPG;
-        return image_mpy_load_jpg(filename, w, h);
+        return image_mpy_load_jpg(filename, w, h, is_mono);
     }
     else
     {
@@ -426,17 +458,19 @@ image_handle_t image_mpy_load(const char *filename, uint16_t *w, uint16_t *h, in
  * @param cropping, cropping the image when drawing
  * @param fbuf, frame buffer to draw
  * @param x, y, w, h, drawing zone in frame buffer
+ * @param fg, bg, fore/background color
  * @return drawing status, true if successful
  */
-bool image_mpy_draw(image_handle_t hima, int8_t ima_type, bool cropping, void *fbuf, int32_t l, int32_t t, int32_t r, int32_t b)
+bool image_mpy_draw(image_handle_t hima, int8_t ima_type, bool cropping, void *fbuf, 
+                    int32_t l, int32_t t, int32_t r, int32_t b, uint16_t fg, uint16_t bg)
 {
     if (ima_type == IMAGE_JPG)
     {
-        return image_mpy_draw_jpg(hima, cropping, fbuf, l, t, r, b);
+        return image_mpy_draw_jpg(hima, cropping, fbuf, l, t, r, b, fg, bg);
     }
     else if (ima_type == IMAGE_PNG)
     {
-        return image_mpy_draw_png(hima, cropping, fbuf, l, t, r, b);
+        return image_mpy_draw_png(hima, cropping, fbuf, l, t, r, b, fg, bg);
     }
     else
     {
@@ -580,7 +614,7 @@ mp_obj_t image_mpy_framebuf_new(const mp_obj_type_t *type, void *data, uint16_t 
     return MP_OBJ_FROM_PTR(o);
 }
 
-bool image_mpy_blit(IMA_IO *imaIo, int32_t x, int32_t y, int32_t fgcol, int32_t bgcol)
+bool image_mpy_blit(IMA_IO *imaIo, int32_t x, int32_t y)
 {
     mp_obj_framebuf_t *dest = MP_OBJ_TO_PTR(imaIo->dst_fbuf);
     mp_obj_framebuf_t *source = MP_OBJ_TO_PTR(imaIo->src_fbuf);
@@ -613,23 +647,30 @@ bool image_mpy_blit(IMA_IO *imaIo, int32_t x, int32_t y, int32_t fgcol, int32_t 
         for (int cx0 = x0; cx0 < x0end; ++cx0)
         {
             // source.pixel(cx1, y1)
-            args_getpixel[1] = MP_OBJ_NEW_SMALL_INT(cx1);
-            args_getpixel[2] = MP_OBJ_NEW_SMALL_INT(y1);
+            args_getpixel[1] = MAKE_MP_INT(cx1);
+            args_getpixel[2] = MAKE_MP_INT(y1);
 
             uint32_t col = mp_obj_get_int(mp_call_function_n_kw(imaIo->fbuf_pixel_method, 3, 0, args_getpixel));
 
             // dest.pixel(cx0, y0, bgcol/fgcol)
-            args_setpixel[1] = MP_OBJ_NEW_SMALL_INT(cx0);
-            args_setpixel[2] = MP_OBJ_NEW_SMALL_INT(y0);
-            if (col == 0)
+            args_setpixel[1] = MAKE_MP_INT(cx0);
+            args_setpixel[2] = MAKE_MP_INT(y0);
+
+            if (imaIo->mono)
             {
-                args_setpixel[3] = MP_OBJ_NEW_SMALL_INT(bgcol);
+                if (col == 0)
+                {
+                    args_setpixel[3] = MAKE_MP_INT(imaIo->fg);
+                }
+                else
+                {
+                    args_setpixel[3] = MAKE_MP_INT(imaIo->bg);
+                }
             }
             else
             {
-                args_setpixel[3] = MP_OBJ_NEW_SMALL_INT(fgcol);
+                args_setpixel[3] = MAKE_MP_INT(col);
             }
-
             mp_call_function_n_kw(imaIo->fbuf_pixel_method, 4, 0, args_setpixel);
 
             ++cx1;

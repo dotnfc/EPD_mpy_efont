@@ -48,6 +48,7 @@ typedef struct _mp_obj_FT2_t
     mp_obj_t hfont; // font file handle within hff2
 
     uint16_t size;
+
     bool mono;
     bool bold;
     bool italic;
@@ -230,7 +231,7 @@ STATIC mp_obj_t mod_efont_FT2_getStringWidth(mp_obj_t self_in, mp_obj_t text)
 STATIC MP_DEFINE_CONST_FUN_OBJ_2(mod_efont_FT2_getStringWidth_obj, mod_efont_FT2_getStringWidth);
 
 // def FT2.setSize(self_in, size: int)
-//@briefset font size to draw
+//@brief set font size to draw
 //@param size, to modify
 STATIC mp_obj_t mod_efont_FT2_setSize(mp_obj_t self_in, mp_obj_t size)
 {
@@ -240,6 +241,41 @@ STATIC mp_obj_t mod_efont_FT2_setSize(mp_obj_t self_in, mp_obj_t size)
     return mp_const_none;
 }
 STATIC MP_DEFINE_CONST_FUN_OBJ_2(mod_efont_FT2_setSize_obj, mod_efont_FT2_setSize);
+
+// def FT2.setRender(self_in, render: FB)
+//@brief set font render
+//@param render, new render to use
+STATIC mp_obj_t mod_efont_FT2_setRender(mp_obj_t self_in, mp_obj_t render)
+{
+    mp_obj_FT2_t *self = MP_OBJ_TO_PTR(self_in);
+
+    // a render with method setPixel(x, y, c) routine, aka framebuf
+    mp_obj_t fb_pixel_fn = mp_load_attr(render, MP_QSTR_pixel);
+
+    if (fb_pixel_fn == mp_const_none)
+    {
+        MP_RAISE_ERROR("fb.pixel() function required.");
+    }
+    else
+    {
+        ff2_mpy_setRender(self->hff2, render, fb_pixel_fn);
+    }
+    return mp_const_none;
+}
+STATIC MP_DEFINE_CONST_FUN_OBJ_2(mod_efont_FT2_setRender_obj, mod_efont_FT2_setRender);
+
+// def FT2.setColor(self_in, fg: int, bg: int)
+//@brief set font foregroud, background color to draw
+//@param size, to modify
+STATIC mp_obj_t mod_efont_FT2_setColor(mp_obj_t self_in, mp_obj_t _fg, mp_obj_t _bg)
+{
+    mp_obj_FT2_t *self = MP_OBJ_TO_PTR(self_in);
+
+    ff2_mpy_setTextColor(self->hff2, mp_obj_get_int(_fg), mp_obj_get_int(_bg));
+
+    return mp_const_none;
+}
+STATIC MP_DEFINE_CONST_FUN_OBJ_3(mod_efont_FT2_setColor_obj, mod_efont_FT2_setColor);
 
 // def FT2.unload(self)
 //@Unload font and free resources
@@ -381,6 +417,8 @@ STATIC const mp_rom_map_elem_t mod_efont_FT2_locals_dict_table[] = {
     {MP_ROM_QSTR(MP_QSTR_drawString), MP_ROM_PTR(&mod_efont_FT2_drawString_obj)},
     {MP_ROM_QSTR(MP_QSTR_getStringWidth), MP_ROM_PTR(&mod_efont_FT2_getStringWidth_obj)},
     {MP_ROM_QSTR(MP_QSTR_setSize), MP_ROM_PTR(&mod_efont_FT2_setSize_obj)},
+    {MP_ROM_QSTR(MP_QSTR_setColor), MP_ROM_PTR(&mod_efont_FT2_setColor_obj)},
+    {MP_ROM_QSTR(MP_QSTR_setRender), MP_ROM_PTR(&mod_efont_FT2_setRender_obj)},
     {MP_ROM_QSTR(MP_QSTR_unload), MP_ROM_PTR(&mod_efont_FT2_unload_obj)},
     {MP_ROM_QSTR(MP_QSTR_getFile), MP_ROM_PTR(&mod_efont_FT2_getFile_obj)},
 };
@@ -409,6 +447,7 @@ typedef struct _mp_obj_Image_t
     int8_t ima_type;         // image type
     uint16_t ima_w, ima_h;   // image width, height
     uint16_t fbuf_w, fbuf_h; // framebuf width, height in pixels
+    uint16_t fg, bg;         // image fore/back color when monochrome mode
 } mp_obj_Image_t;
 
 // def Image.__init__(self_in, SCN_W, SCN_H)
@@ -426,6 +465,10 @@ STATIC mp_obj_t mod_efont_Image_make_new(const mp_obj_type_t *type, size_t n_arg
     self->ima_w = 0;
     self->ima_h = 0;
 
+    self->mono = false;
+    self->fg = 1;
+    self->bg = 0;
+
     self->fbuf_w = mp_obj_get_int(args_in[0]);
     self->fbuf_h = mp_obj_get_int(args_in[1]);
 
@@ -441,7 +484,6 @@ STATIC mp_obj_t mod_efont_Image_make_new(const mp_obj_type_t *type, size_t n_arg
 //@return True done, False failed
 STATIC mp_obj_t mod_efont_Image_draw(size_t n_args, const mp_obj_t *args_in)
 {
-
     mp_obj_Image_t *self = MP_OBJ_TO_PTR(args_in[0]);
 
     if (self->hima == NULL)
@@ -493,7 +535,7 @@ STATIC mp_obj_t mod_efont_Image_draw(size_t n_args, const mp_obj_t *args_in)
         cropping = true; // image is larger than canvas` bottom
     }
 
-    bool ret = image_mpy_draw(self->hima, self->ima_type, cropping, dest_fbuf, left, top, right, bottom);
+    bool ret = image_mpy_draw(self->hima, self->ima_type, cropping, dest_fbuf, left, top, right, bottom, self->fg, self->bg);
 
     if (unload)
     {
@@ -520,7 +562,7 @@ STATIC mp_obj_t mod_efont_Image_load(size_t n_args, const mp_obj_t *args_in)
         self->mono = mp_obj_is_true(args_in[2]);
     }
 
-    self->hima = image_mpy_load(font_file, &self->ima_w, &self->ima_h, &self->ima_type);
+    self->hima = image_mpy_load(font_file, &self->ima_w, &self->ima_h, &self->ima_type, self->mono);
     if (self->hima == NULL)
     {
         MP_RAISE_ERROR("failed to load image");
@@ -531,6 +573,20 @@ STATIC mp_obj_t mod_efont_Image_load(size_t n_args, const mp_obj_t *args_in)
     return mp_obj_new_bool(true);
 }
 STATIC MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(mod_efont_Image_load_obj, 2, 3, mod_efont_Image_load);
+
+// def Image.setColor(self_in, fg: int, bg: int)
+//@brief set image foregroud, background color to draw
+//@param fg, bg, the color to set
+STATIC mp_obj_t mod_efont_Image_setColor(mp_obj_t self_in, mp_obj_t _fg, mp_obj_t _bg)
+{
+    mp_obj_Image_t *self = MP_OBJ_TO_PTR(self_in);
+
+    self->fg = mp_obj_get_int(_fg);
+    self->bg = mp_obj_get_int(_bg);
+
+    return mp_const_none;
+}
+STATIC MP_DEFINE_CONST_FUN_OBJ_3(mod_efont_Image_setColor_obj, mod_efont_Image_setColor);
 
 // def Image.unload(self_in)
 //@brief Unload image, free image resource
@@ -613,6 +669,7 @@ STATIC const mp_obj_type_t mod_efont_Image_type;
 STATIC const mp_rom_map_elem_t mod_efont_Image_locals_dict_table[] = {
     {MP_ROM_QSTR(MP_QSTR_draw), MP_ROM_PTR(&mod_efont_Image_draw_obj)},
     {MP_ROM_QSTR(MP_QSTR_load), MP_ROM_PTR(&mod_efont_Image_load_obj)},
+    {MP_ROM_QSTR(MP_QSTR_setColor), MP_ROM_PTR(&mod_efont_Image_setColor_obj)},
     {MP_ROM_QSTR(MP_QSTR_unload), MP_ROM_PTR(&mod_efont_Image_unload_obj)},
 };
 STATIC MP_DEFINE_CONST_DICT(mod_efont_Image_locals_dict, mod_efont_Image_locals_dict_table);

@@ -22,9 +22,10 @@
 
 typedef void* image_handle_t;
 
-image_handle_t image_mpy_load(const char *filename, uint16_t *w, uint16_t *h, int8_t *ima_type);
+image_handle_t image_mpy_load(const char *filename, uint16_t *w, uint16_t *h, int8_t *ima_type, bool is_mono);
 void           image_mpy_set_fbuf_info(image_handle_t hima, int8_t ima_type, uint16_t width, uint16_t height);
-bool           image_mpy_draw(image_handle_t hima, int8_t ima_type, bool cropping, void *fbuf, int32_t l, int32_t t, int32_t r, int32_t b);
+bool           image_mpy_draw(image_handle_t hima, int8_t ima_type, bool cropping, void *fbuf, 
+                              int32_t l, int32_t t, int32_t r, int32_t b, uint16_t fg, uint16_t bg);
 bool           image_mpy_unload(image_handle_t hima, int8_t ima_type);
 
 #endif // _IMAGE_MPY_H

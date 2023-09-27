@@ -39,9 +39,9 @@ def wifi_connect(epd, font, ssid, password):
     wlan.active(True)
     
     print("Begin to connect wifi...")
-    font.drawString(10, 100, 380, 24, ALIGN_CENTER, f"正在连接 {ssid} ...")
+    font.drawString(10, 100, epd.WIDTH - 10, 24, ALIGN_CENTER, f"正在连接 {ssid} ...")
     epd.refresh()
-    
+        
     wlan.connect(ssid, password)
 
     count = 0
@@ -54,7 +54,8 @@ def wifi_connect(epd, font, ssid, password):
     
     if wlan.isconnected():
         print("Wifi connect successful")
-        font.drawString(10, 140, 380, 24, ALIGN_CENTER, "已连接")
+        font.drawString(10, 140, epd.WIDTH - 10, 24, ALIGN_CENTER, "已连接")
+        
         epd.refresh(full=False)
         return True
     else:
@@ -95,10 +96,11 @@ def main():
     epd.init()
     epd.fill(WHITE)
     font = FT2("font/simyou-lite.ttf", render=epd, mono=True, size=24)
+    
     ttfIco = FT2("font/qweather-icons.ttf", render=epd, mono=True, size=32)
     if not wifi_connect(epd, font, ssid, password):
         showOffline(epd, font, ssid)
-        epd.deepsleep(15000)
+        epd.deepSleep(15000)
     
     cityid = "101010100"  
     url = "http://www.tianqiapi.com/api/?version=v6&cityid=" + cityid + "&appid=65251531&appsecret=Yl2bzCYb"
@@ -136,7 +138,7 @@ def main():
     epd.refresh()
     
     
-    #epd.deepsleep(15000)
+    #epd.deepSleep(15000)
     
 if __name__ == "__main__":
     main()

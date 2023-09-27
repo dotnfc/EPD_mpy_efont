@@ -21,14 +21,10 @@ def main():
     #epd.refresh()
     
     #time.sleep(1.5)
-    ico = FT2("font/qweather-icons.ttf", render=epd, size=32)
-    ico.mono=True
-    ff = FT2("font/simyou-lite.ttf", render=epd, size=16)
-    ff.mono=True
-    wqy = FT2("font/wenquanyi_12pt.pcf", render=epd, size=16)
-    wqy.mono=True
-    wqyb = FT2("font/wenquanyi_12ptb.pcf", render=epd, size=16)
-    wqyb.mono=True
+    ico = FT2("font/qweather-icons.ttf", render=epd, mono=True, size=32)
+    ff = FT2("font/simyou-lite.ttf", render=epd, mono=True, size=16)
+    wqy = FT2("font/wenquanyi_12pt.pcf", render=epd, mono=True, size=16)
+    wqyb = FT2("font/wenquanyi_12ptb.pcf", render=epd, mono=True, size=16)
 
     epd.fill(white)
     

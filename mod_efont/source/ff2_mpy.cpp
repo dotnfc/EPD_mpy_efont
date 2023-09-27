@@ -141,6 +141,9 @@ void *ff2_mpy_loadFont(const char *file, void *old_ctx)
     memset(pctx, 0, sizeof(ff2_context_t));
     pctx->font_height = 0;
     pctx->font_file = file;
+    
+    pctx->fg = 1;
+    pctx->bg = 0;
 
     if (pctx->g_FtLibraryLoaded != INIT_MAGIC)
     {
