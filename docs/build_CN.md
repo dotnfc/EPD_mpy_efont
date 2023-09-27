@@ -130,13 +130,22 @@ storing the address of local variable 'buffer' in '*worker.cell_null' [-Wdanglin
     >>> import gc
     >>>
     >>> mem_free = gc.mem_free()
-    >>> _start = timer.ticks_ms()
+    >>> _start = time.ticks_ms()
     >>> import font24
-    >>> _stop = timer.ticks_ms() # module has loaded
+    >>> _stop = time.ticks_ms() # module has loaded
     >>> print(mem_free - gc.mem_free())
     36656
-    >>> print(_stop - _start)   # in ms
-    1666.031
+    >>> print("time used: %d ms" % (_stop - _start))   # in ms
+    time used: 1666.031
+    ```
+
+    -- or --
+    ```
+    t = time.ticks_us()
+    original_byte_array = bytearray(960 * 640 // 8)
+    inverted_byte_array = bytearray([~byte for byte in original_byte_array])
+    delta = time.ticks_diff(time.ticks_us(), t)
+    print('Function {} Time = {:6.3f}ms'.format("tt", delta/1000))
     ```
 5. 模块的安装
 [micropython-lib](https://github.com/micropython/micropython-lib)
