@@ -26,6 +26,7 @@ def main():
     epd.clear(EPD_WHITE, EPD_WHITE)
     epd.setColor(EPD_RED, EPD_WHITE)
             
+    epd.line_3c(10, 90, epd.WIDTH -1, 90, 1)        
     epd.drawText(490, 100, 200, 60, ALIGN_LEFT, "Hello 世界 16px")
     epd.drawText(490, 120, 200, 60, ALIGN_LEFT, "Hello 世界 32px", 32)
     epd.drawText(490, 160, 200, 60, ALIGN_LEFT, "Hello 世界 48px", 48)
@@ -39,6 +40,11 @@ def main():
     epd.drawText(80, 240, 400, 32, ALIGN_LEFT, ICO_LOGO_NFC, 48)
     epd.drawText(132, 240, 400, 32, ALIGN_LEFT, ICO_LOGO_NFC, 32)
     epd.drawText(170, 240, 400, 32, ALIGN_LEFT, ICO_LOGO_NFC, 16)
+    
+    epd.loadFont("7seg")
+    epd.selectFont("7seg")
+    epd.line_3c(10, 320, epd.WIDTH -1, 320, 1)
+    epd.drawText(10, 330, 400, 30, ALIGN_LEFT, "2023/09/27 11:11", 112)
     
     epd.text_3c("text here", 20, 500, 1)
     

@@ -85,6 +85,19 @@ class FT2(object):
         '''
         pass
     
+    def setColor(self, fg: int, bg: int):
+        '''Set the foreground and background color when monochrome mode
+        '''
+        pass
+    
+    def setRender(self, render: FrameBuffer):
+        '''Set font new render
+        
+        Args:
+            render, new render to use
+        '''
+        pass
+
 class Image(object):
     """PNG, JPG Wrapper Class
     """
@@ -120,6 +133,11 @@ class Image(object):
             render: the container to rend, must be a FrameBuffer (derived) instance
             x, y: left-top position to draw
             unload: free image resources after drawing automatically.
+        '''
+        pass
+    
+    def setColor(self, fg: int, bg: int):
+        '''Set the foreground and background color when monochrome mode
         '''
         pass
     

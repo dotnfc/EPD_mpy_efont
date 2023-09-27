@@ -133,13 +133,12 @@ class EpdImage(EPD):
     
     def drawText(self, x, y, w, h, align, text, size=-1):
         if self.font == None:
-            print("Font not selected")
-            return
+            raise RuntimeError("Font not selected")
         
         if size != -1:
-            self.font.drawString(x, y, w, h, align, text, size)
+            return self.font.drawString(x, y, w, h, align, text, size)
         else:
-            self.font.drawString(x, y, w, h, align, text)
+            return self.font.drawString(x, y, w, h, align, text)
 
     def text_3c(self, s, x, y, c=1):
         '''
