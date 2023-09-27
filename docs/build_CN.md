@@ -191,6 +191,25 @@ storing the address of local variable 'buffer' in '*worker.cell_null' [-Wdanglin
     >>> arr32k = bytearray(32 * 1024)
     ```
 
+7. unix 上测试脚本的 shell 设置
+    ```shell
+    export EFONT=/home/dotnfc/mpy/EPD_mpy_efont
+    export PATH=/home/dotnfc/.local/bin/:$EFONT/micropython/ports/unix/build-standard/:$PATH
+    export MICROPYPATH=.frozen:$EFONT/examples:$EFONT/examples/lib
+    alias mpy='micropython -X heapsize=10m '
+    ```
+    如果没有安装 SDL2，请执行 
+    ```shell
+    sudo apt-get install libsdl2-2.0 libsdl2-dev
+    ```
+    如果报错，说无法打开 DISPLAY，或者无窗口，那就需要更新 wsl2，请[参考](https://stackoverflow.com/a/68856351)
+
+    当然，也可以先安装一下 xeyes，如果可以显示就说明 WSLg 工作正常
+
+    ```shell
+    $ sudo apt-get -y install x11-apps
+    $ xeyes
+    ``` 
 <hr>
 
 *.nfc 2023/09/09*
