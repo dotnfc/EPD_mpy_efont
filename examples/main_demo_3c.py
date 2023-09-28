@@ -43,6 +43,7 @@ def main():
     
     epd.loadFont("7seg")
     epd.selectFont("7seg")
+    epd.setColor(EPD_BLACK, EPD_WHITE)
     epd.line_3c(10, 320, epd.WIDTH -1, 320, 1)
     epd.drawText(10, 330, 400, 30, ALIGN_LEFT, "2023/09/27 11:11", 112)
     

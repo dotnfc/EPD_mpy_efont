@@ -264,8 +264,8 @@ int16_t ff2_mpy_getLineHeight(void *ctx)
 
 uint16_t ff2_mpy_getTextWidth(void *ctx, const char *text)
 {
-    void *p = ff2_mpy_get_mp_file_obj(ctx);
-    FF2M_DMSG("file_obj => %p\n", p);
+    //void *p = ff2_mpy_get_mp_file_obj(ctx);
+    //FF2M_DMSG("file_obj => %p\n", p);
 
     return ff2_mpy_drawString(ctx, text, 0, 0, true);
 }

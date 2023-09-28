@@ -97,4 +97,4 @@ mpy 的 esp32 port 需要做一个 [patch](tools/esp32-patch.diff)
 
 <hr>
 
-*.nfc 2023/09/09*
+*2023/09/09*

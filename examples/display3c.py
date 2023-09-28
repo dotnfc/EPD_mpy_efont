@@ -96,6 +96,7 @@ class EpdImage(EPD):
         
         if self.font != None:
             self.font.setRender(self.fb)    # update current font render
+            self.font.setColor(self.foreColor, self.backColor)
             
     def loadFont(self, fonName, size=16):
         '''Load font file from storage.
@@ -124,11 +125,10 @@ class EpdImage(EPD):
         '''
         if fonName in self.fonts:
             self.font = self.fonts[f'{fonName}']
+            self.font.setRender(self.fb)    # update current font render
+            self.font.setColor(self.foreColor, self.backColor)
             return True
-        
-        self.font.setRender(self.fb)    # update current font render
-        self.font.setColor(self.foreColor, self.backColor)
-        
+                
         return False
     
     def drawText(self, x, y, w, h, align, text, size=-1):
