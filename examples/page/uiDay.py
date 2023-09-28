@@ -67,7 +67,7 @@ def drawBody(epd):
 
 def drawFootbar(epd):
         
-    url = "https://v1.hitokoto.cn/?encode=json&min_length=1&max_length=25"
+    url = "https://v1.hitokoto.cn/?encode=json&min_length=1&max_length=28"
     r = requests.get(url)
     jdoc = json.loads(r.content.decode())
     text = jdoc["hitokoto"]
