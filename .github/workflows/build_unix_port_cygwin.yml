@@ -1,4 +1,4 @@
-name: unix port on cygwin
+name: unix port in cygwin
 
 on:
   workflow_dispatch:
@@ -24,8 +24,8 @@ jobs:
     - name: Setup Cygwin
       run: |
         choco install -y cygwin
-        cygwin-setup.exe -q -P git, python3.9, wget, tar, make, gcc-core, gcc-g++,  \
-              autoconf, bison, pkgconf, pkg-config, libffi6, libffi8, libffi-devel, \
+        cygwin-setup.exe -q -P git, python3.9, wget, tar, make, gcc-core, gcc-g++,  |
+              autoconf, bison, pkgconf, pkg-config, libffi6, libffi8, libffi-devel, |
               libtool, libpkgconf3, libpkgconf4, libSDL2, libSDL2-devel
 
     - name: Build with Cygwin
