@@ -50,7 +50,7 @@ jobs:
         
     - name: Build with Cygwin
       run: |
-         bash.exe -eo pipefail -o igncr -c "git config --global --add safe.directory $GITHUB_WORKSPACE/micropython"
+         bash.exe -eo pipefail -o igncr -c "git config --global --add safe.directory ${GITHUB_WORKSPACE}/micropython"
          bash.exe -eo pipefail -o igncr -c "source tools/ci.sh && ci_unix_build_cygwin"
 
     - name: Upload Release Asset
