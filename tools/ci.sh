@@ -60,8 +60,7 @@ function ci_esp32_build {
     make ${MAKEOPTS} -C micropython/ports/esp32 \
         USER_C_MODULES=../../../../mod_efont/source/micropython.cmake \
         BOARD_DIR=../../../mod_efont/boards/EFORE_S3 \
-        CWARN="-Wno-error=unused-variable" \
-        FROZEN_MANIFEST=$(pwd)/ports/esp32/boards/manifest_test.py
+        CWARN="-Wno-error=unused-variable"
 }
 
 ########################################################################################
