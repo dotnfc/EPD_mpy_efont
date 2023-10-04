@@ -1,0 +1,30 @@
+name: esp32 port
+
+on:
+  workflow_dispatch:
+    # Inputs the workflow accepts.
+    inputs:
+      name:
+        description: 'build rev'
+        default: '1.0.0'
+        required: true
+        type: string
+
+jobs:
+  build_idf50:
+    runs-on: ubuntu-20.04
+
+    steps:
+    - name: Send greeting
+      run: echo "version ${{ inputs.name }}"    
+    - uses: actions/checkout@v4
+    - name: Checkout Submodule micropython
+      run: |
+        git submodule init
+        git submodule update --recursive -- micropython
+    - name: Install packages
+      run: source tools/ci.sh && ci_esp32_idf50_setup        
+    - name: Build
+      run: source tools/ci.sh && ci_esp32_build
+  
+      
