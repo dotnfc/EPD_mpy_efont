@@ -49,6 +49,7 @@ jobs:
         
     - name: Build with Cygwin
       run: |
+         make.exe -C micropython/ports/unix MICROPY_STANDALONE=1 submodules
          bash.exe -eo pipefail -o igncr -c "source tools/ci.sh && ci_unix_build_cygwin"
 
     - name: Upload Release Asset
