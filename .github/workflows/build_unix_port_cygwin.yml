@@ -31,6 +31,18 @@ jobs:
     - name: Build with Cygwin
       run: |
         export PATH="/cygdrive/c/cygwin64/bin:$PATH"
-        # Add your build commands here
+        run: source tools/ci.sh && ci_unix_build_cygwin
 
-        # ... todo ...
+    - name: Upload Release Asset
+      uses: actions/upload-artifact@v3
+      with:
+        name: mpy_efont_demo
+        path: |
+          micropython/ports/unix/build-standard/micropython.exe
+          /cygdrive/c/cygwin64/bin/cygffi-6.dll
+          /cygdrive/c/cygwin64/bin/cygffi-8.dll
+          /cygdrive/c/cygwin64/bin/cyggcc_s-seh-1.dll
+          /cygdrive/c/cygwin64/bin/cygstdc++-6.dll
+          /cygdrive/c/cygwin64/bin/cygwin1.dll
+          /cygdrive/c/cygwin64/bin/cygSDL2-2-0-0.dll
+          examples/
