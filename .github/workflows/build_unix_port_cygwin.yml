@@ -1,0 +1,36 @@
+name: unix port on cygwin
+
+on:
+  workflow_dispatch:
+    # Inputs the workflow accepts.
+    inputs:
+      name:
+        description: 'build rev'
+        default: '1.0.0'
+        required: true
+        type: string
+
+jobs:
+  standard:
+    runs-on: windows-latest
+    steps:
+    - name: Send greeting
+      run: echo "version ${{ inputs.name }}"    
+    - uses: actions/checkout@v4
+    - name: Checkout Submodule micropython
+      run: |
+        git submodule init
+        git submodule update --recursive -- micropython
+    - name: Setup Cygwin
+      run: |
+        choco install -y cygwin
+        cygwin-setup.exe -q -P git, python3.9, wget, tar, make, gcc-core, gcc-g++,  \
+              autoconf, bison, pkgconf, pkg-config, libffi6, libffi8, libffi-devel, \
+              libtool, libpkgconf3, libpkgconf4, libSDL2, libSDL2-devel
+
+    - name: Build with Cygwin
+      run: |
+        export PATH="/cygdrive/c/cygwin64/bin:$PATH"
+        # Add your build commands here
+
+        # ... todo ...
