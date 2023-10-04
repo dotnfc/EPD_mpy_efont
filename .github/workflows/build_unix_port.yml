@@ -1,0 +1,24 @@
+name: unix port
+
+on:
+  workflow_dispatch:
+    # Inputs the workflow accepts.
+    inputs:
+      name:
+        description: 'build rev'
+        default: '1.0.0'
+        required: true
+        type: string
+
+jobs:
+  standard:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Send greeting
+      run: echo "version ${{ inputs.name }}"    
+    - uses: actions/checkout@v4
+    - name: Build
+      run: source tools/ci.sh && ci_unix_standard_build
+
+
