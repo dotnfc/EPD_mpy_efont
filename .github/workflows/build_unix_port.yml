@@ -18,9 +18,10 @@ jobs:
     - name: Send greeting
       run: echo "version ${{ inputs.name }}"    
     - uses: actions/checkout@v4
-      with:
-        submodules: 'recursive'
-        
+    - name: Checkout Submodule micropython
+      run: |
+        git submodule init
+        git submodule update --recursive -- micropython    
     - name: Build
       run: source tools/ci.sh && ci_unix_standard_build
 
