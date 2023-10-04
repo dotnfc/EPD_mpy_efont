@@ -15,7 +15,7 @@
 
 in cygwin shell(launch {CYGWIN}\Cygwin.bat)
   ```shell
-  $ apt-cyg install autoconf bison pkgconf pkg-config libffi6 libffi8 libffi-devel libtool libpkgconf3 libpkgconf4  libSDL2 libSDL2-devel gcc-g++
+  $ apt-cyg install autoconf bison pkgconf pkg-config libffi6 libffi8 libffi-devel libtool libpkgconf3 libpkgconf4  libSDL2_2.0_0 libSDL2-devel gcc-g++
   ```
 
 ### 1.4 optional settings 
