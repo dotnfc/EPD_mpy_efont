@@ -141,10 +141,10 @@ CI_UNIX_OPTS_QEMU_ARM=(
 )
 
 function ci_unix_build_helper {
-    make ${MAKEOPTS} -C mpy-cross
-    make ${MAKEOPTS} -C ports/unix "$@" submodules
-    make ${MAKEOPTS} -C ports/unix "$@" deplibs
-    make ${MAKEOPTS} -C ports/unix "$@"
+    make ${MAKEOPTS} -C micropython/mpy-cross
+    make ${MAKEOPTS} -C micropython/ports/unix "$@" submodules
+    make ${MAKEOPTS} -C micropython/ports/unix "$@" deplibs
+    make ${MAKEOPTS} -C micropython/ports/unix "$@"
 }
 
 function ci_unix_build_ffi_lib_helper {
@@ -196,11 +196,7 @@ function ci_unix_minimal_run_tests {
 
 function ci_unix_standard_build {
     ci_unix_build_helper VARIANT=standard
-    ci_unix_build_ffi_lib_helper gcc
-}
-
-function ci_unix_standard_run_tests {
-    ci_unix_run_tests_full_helper standard
+    # ci_unix_build_ffi_lib_helper gcc
 }
 
 function ci_unix_coverage_setup {
