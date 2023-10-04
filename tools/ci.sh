@@ -143,6 +143,7 @@ function ci_unix_build_helper {
 }
 
 function ci_unix_build_cygwin {
+    git config --global --add safe.directory ${PWD}/micropython
     make ${MAKEOPTS} -C micropython/mpy-cross
     make ${MAKEOPTS} -C micropython/ports/unix "$@" MICROPY_STANDALONE=1 submodules
     make ${MAKEOPTS} -C micropython/ports/unix libffi
