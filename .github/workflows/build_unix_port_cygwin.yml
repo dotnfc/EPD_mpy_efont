@@ -35,6 +35,7 @@ jobs:
           gcc-core
           gcc-g++
           autoconf
+          automake
           bison
           pkgconf
           pkg-config
@@ -49,7 +50,7 @@ jobs:
         
     - name: Build with Cygwin
       run: |
-         bash.exe -eo pipefail -o igncr -c "git config --global --add safe.directory /cygdrive/d/a/EPD_mpy_efont/EPD_mpy_efont/micropython"
+         bash.exe -eo pipefail -o igncr -c "git config --global --add safe.directory $GITHUB_WORKSPACE/micropython"
          bash.exe -eo pipefail -o igncr -c "source tools/ci.sh && ci_unix_build_cygwin"
 
     - name: Upload Release Asset
