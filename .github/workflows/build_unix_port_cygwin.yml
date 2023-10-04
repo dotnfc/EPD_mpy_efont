@@ -47,7 +47,6 @@ jobs:
           libSDL2-devel
     - name: Build with Cygwin
       run: |
-        export PATH="/cygdrive/c/cygwin64/bin:$PATH"
         run: source tools/ci.sh && ci_unix_build_cygwin
 
     - name: Upload Release Asset
