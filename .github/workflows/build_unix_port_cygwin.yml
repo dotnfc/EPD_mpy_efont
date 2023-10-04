@@ -48,7 +48,7 @@ jobs:
         
     - name: Build with Cygwin
       run: |
-         bash.exe -eo pipefail -o igncr -c "tools/ci.sh && ci_unix_build_cygwin"
+         bash.exe -eo pipefail -o igncr -c "source tools/ci.sh && ci_unix_build_cygwin"
 
     - name: Upload Release Asset
       uses: actions/upload-artifact@v3
