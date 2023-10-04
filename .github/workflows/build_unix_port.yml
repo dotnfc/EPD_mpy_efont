@@ -18,6 +18,9 @@ jobs:
     - name: Send greeting
       run: echo "version ${{ inputs.name }}"    
     - uses: actions/checkout@v4
+      with:
+        submodules: 'recursive'
+        
     - name: Build
       run: source tools/ci.sh && ci_unix_standard_build
 
