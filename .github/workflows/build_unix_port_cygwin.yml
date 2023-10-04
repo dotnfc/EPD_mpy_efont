@@ -45,8 +45,10 @@ jobs:
           libpkgconf4
           libSDL2
           libSDL2-devel
+        
     - name: Build with Cygwin
-      run: bash.exe tools/ci.sh && ci_unix_build_cygwin
+      run: |
+         bash.exe -eo pipefail -o igncr -c "tools/ci.sh && ci_unix_build_cygwin"
 
     - name: Upload Release Asset
       uses: actions/upload-artifact@v3
