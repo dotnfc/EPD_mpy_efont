@@ -21,7 +21,7 @@ jobs:
       run: |
         git submodule init
         git submodule update --recursive -- micropython
-        git config --global --add safe.directory ./micropython
+        
     - name: Setup Cygwin
       uses: cygwin/cygwin-install-action@v4
       with:
@@ -49,7 +49,7 @@ jobs:
         
     - name: Build with Cygwin
       run: |
-         make.exe -C micropython/ports/unix MICROPY_STANDALONE=1 submodules
+         bash.exe -eo pipefail -o igncr -c "git config --global --add safe.directory /cygdrive/d/a/EPD_mpy_efont/EPD_mpy_efont/micropython"
          bash.exe -eo pipefail -o igncr -c "source tools/ci.sh && ci_unix_build_cygwin"
 
     - name: Upload Release Asset
