@@ -142,6 +142,16 @@ function ci_unix_build_helper {
     make ${MAKEOPTS} -C micropython/ports/unix "$@"
 }
 
+function ci_unix_build_cygwin {
+    make ${MAKEOPTS} -C micropython/mpy-cross
+    make ${MAKEOPTS} -C micropython/ports/unix "$@" MICROPY_STANDALONE=1 submodules
+    make ${MAKEOPTS} -C micropython/ports/unix libffi
+    make ${MAKEOPTS} -C micropython/ports/unix "$@" MICROPY_STANDALONE=1 deplibs
+    make ${MAKEOPTS} -C micropython/ports/unix "$@" MICROPY_STANDALONE=1 \
+         USER_C_MODULES=../../../mod_efont/ \
+         FROZEN_MANIFEST=../../../mod_efont/unix_std_manifest.py
+}
+
 function ci_unix_build_ffi_lib_helper {
     $1 $2 -shared -o tests/unix/ffi_lib.so tests/unix/ffi_lib.c
 }
