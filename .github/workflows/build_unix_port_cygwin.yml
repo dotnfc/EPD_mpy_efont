@@ -58,10 +58,8 @@ jobs:
         name: mpy_efont_demo
         path: |
           micropython/ports/unix/build-standard/micropython.exe
-          /cygdrive/c/cygwin64/bin/cygffi-6.dll
-          /cygdrive/c/cygwin64/bin/cygffi-8.dll
-          /cygdrive/c/cygwin64/bin/cyggcc_s-seh-1.dll
-          /cygdrive/c/cygwin64/bin/cygstdc++-6.dll
-          /cygdrive/c/cygwin64/bin/cygwin1.dll
-          /cygdrive/c/cygwin64/bin/cygSDL2-2-0-0.dll
+          c:\cygwin64\bin\cyggcc_s-seh-1.dll
+          c:\cygwin64\bin\cygstdc++-6.dll
+          c:\cygwin64\bin\cygwin1.dll
+          c:\cygwin64\bin\cygSDL2-2-0-0.dll
           examples/
