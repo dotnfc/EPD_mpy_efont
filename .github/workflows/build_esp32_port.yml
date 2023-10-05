@@ -26,5 +26,11 @@ jobs:
       run: source tools/ci.sh && ci_esp32_idf50_setup        
     - name: Build
       run: source tools/ci.sh && ci_esp32_build
-  
+    - name: Upload Release Asset
+      uses: actions/upload-artifact@v3
+      with:
+        name: mpy_efont_esp32s3_fw
+        path: |
+          micropython/ports/esp32/build-EFORE_S3/firmware.bin
+
       
