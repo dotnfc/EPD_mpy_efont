@@ -6,7 +6,7 @@ on:
     inputs:
       name:
         description: 'output folder'
-        default: examples'
+        default: 'examples'
         required: true
         type: string
 
