@@ -1,4 +1,4 @@
-name: esp32 port
+name: vfs image 
 
 on:
   workflow_dispatch:
