@@ -28,7 +28,7 @@ jobs:
         platform: x86_64
         packages: >  
           git 
-          python3.9 
+          python39 
           wget
           tar
           make
@@ -45,7 +45,7 @@ jobs:
           libtool
           libpkgconf3
           libpkgconf4
-          libSDL2
+          libSDL2_2.0_0
           libSDL2-devel
         
     - name: Build with Cygwin
