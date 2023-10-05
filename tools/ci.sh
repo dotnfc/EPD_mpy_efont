@@ -150,6 +150,7 @@ function ci_unix_build_cygwin {
     make ${MAKEOPTS} -C micropython/ports/unix "$@" MICROPY_STANDALONE=1 deplibs
     make ${MAKEOPTS} -C micropython/ports/unix "$@" MICROPY_STANDALONE=1 \
          USER_C_MODULES=../../../mod_efont/ \
+         CWARN="-Wno-error=attributes"      \
          FROZEN_MANIFEST=../../../mod_efont/unix_std_manifest.py
 }
 
