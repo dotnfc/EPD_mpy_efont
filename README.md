@@ -73,18 +73,7 @@ And the unix port, its default heap size is too small for 3c 10.2' examples, we 
 ```shell
 mpy -X heapsize=8m page/uiDay.py
 ```
-<hr>
 
-## <span style="color:red;">NOTE</span>
-the ESP32 port of MicroPython (mpy) requires applying a [patch](tools/esp32-patch.diff)
-
-- The current FT2 middleware implementation requires a larger stack space, so you need to adjust the size of ESP32's MP_TASK_STACK_SIZE in
-micropython/ports/esp32/main.c
-
-```c
-#define MP_TASK_STACK_SIZE      (24 * 1024)
-```
-<hr>
 
 ## References
 - https://github.com/takkaO/OpenFontRender [FT2 Wrapper Interface]

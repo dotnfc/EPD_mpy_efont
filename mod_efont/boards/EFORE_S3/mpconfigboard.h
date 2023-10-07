@@ -15,4 +15,4 @@
 #define MICROPY_HW_ENABLE_UART_REPL         (1)
 
 // MicroPython Task Stack Size
-//#define MICROPY_TASK_STACK_SIZE             (24 * 1024)
+#define MICROPY_TASK_STACK_SIZE             (32 * 1024)

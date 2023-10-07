@@ -16,7 +16,13 @@ from logger import *
 from board import *
 import ustruct
 
+# RAM Black(0) & White(1)
+RBW_BLACK = const(0)
+RBW_WHITE = const(1)
 
+# RAM Red(1) & White(0)
+RRW_RED = const(1)
+RRW_WHITE = const(0)
 
 BUSY = const(1)  # 1=busy, 0=idle
 
@@ -25,14 +31,6 @@ class EPD(FrameBuffer):
     WIDTH  = const(960)
     HEIGHT = const(640)
     BUF_SIZE = const(WIDTH * HEIGHT // 8)
-
-    # RAM Black(0) & White(1)
-    RBW_BLACK = const(0)
-    RBW_WHITE = const(1)
-
-    # RAM Red(1) & White(0)
-    RRW_RED = const(1)
-    RRW_WHITE = const(0)
 
     def __init__(self):
         self.spi = SPI(2, baudrate=10000000, polarity=0, phase=0, sck=EPD_PIN_SCK, mosi=EPD_PIN_SDA)

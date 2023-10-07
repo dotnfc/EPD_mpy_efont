@@ -17,5 +17,6 @@
         "examples/.efont",
         "examples/lib",
         "mod_efont/modules",
-    ]
+    ],
+    "editor.rulers": [120]
 }

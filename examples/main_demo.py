@@ -18,7 +18,7 @@ try:
 except ImportError:
     import unetwork as network
 
-def showOffline(epd, font, ssid):
+def showOffline(epd, ssid):
     epd.clear()
     epd.drawText(10, 10, 400, 24, ALIGN_LEFT, "2023-09-14")
     epd.rect(2, 35, 230, 3, EPD_BLACK, True)
