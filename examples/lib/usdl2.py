@@ -68,7 +68,12 @@ SDL_PIXELFORMAT_RGB24 = \
                                24, 3)
 
 
-_sdl = ffi.open("libSDL2-2.0.so.0")
+# try to load sdl2 library
+try:
+    print("Loading sdl2 library")
+    _sdl = ffi.open("libSDL2-2.0.so.0")
+except OSError:
+    _sdl = ffi.open("SDL2.dll")
 
 SDL_Init = _sdl.func("i", "SDL_Init", "I")
 SDL_Quit = _sdl.func("v", "SDL_Quit", "")
