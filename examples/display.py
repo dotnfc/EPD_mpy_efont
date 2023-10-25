@@ -10,6 +10,7 @@ import sys
 if sys.platform == 'linux':
     from panel.epd_sdl_420bw import *
 else:
+    # from panel.epd_0426T8 import *
     from panel.epd_z96 import *
     # from panel.epd_z98 import *
     # from panel.epd_cz11 import *
@@ -102,6 +103,12 @@ class EpdImage(EPD):
                
         return False
     
+    def setFontSize(self, size):
+        if self.font == None:
+            raise RuntimeError("Font not selected")
+        
+        self.font.setSize(size)
+        
     def drawText(self, x, y, w, h, align, text, size=-1):
         if self.font == None:
             raise RuntimeError("Font not selected")
