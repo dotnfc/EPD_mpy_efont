@@ -238,6 +238,7 @@ STATIC mp_obj_t mod_efont_FT2_setSize(mp_obj_t self_in, mp_obj_t size)
     mp_obj_FT2_t *self = MP_OBJ_TO_PTR(self_in);
 
     self->size = mp_obj_get_int(size);
+    ff2_mpy_setSize(self->hff2, self->size);
     return mp_const_none;
 }
 STATIC MP_DEFINE_CONST_FUN_OBJ_2(mod_efont_FT2_setSize_obj, mod_efont_FT2_setSize);

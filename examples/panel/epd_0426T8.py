@@ -81,8 +81,8 @@ class EPD(FrameBuffer):
             print("full update")
             self.update_full()
         else:
-            print("fast update")
-            self.update_fast()
+            print("partial update")
+            self.update_partial()
         
     def init(self):
         self.init_full()
@@ -128,7 +128,7 @@ class EPD(FrameBuffer):
         self.init_panel()
         self.power_on()
         
-    def init_partial(self):
+    def init_fast(self):
         self.init_panel()
         self.power_on()
         
@@ -139,7 +139,7 @@ class EPD(FrameBuffer):
         self._command(0x20)
 
         self.wait_until_idle() 
-        
+    
     def update_full(self):
         self._command(0x22, b'\xF7') # Display Update Control
         self._command(0x20) # Activate Display Update Sequence
