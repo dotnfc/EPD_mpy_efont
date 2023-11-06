@@ -16,3 +16,22 @@
 
 // MicroPython Task Stack Size
 #define MICROPY_TASK_STACK_SIZE             (32 * 1024)
+
+// 
+#define MICROPY_HW_ENABLE_SDCARD            (1)
+#define MICROPY_HW_SDMMC_SLOT_CONFIG() {\
+    .clk = GPIO_NUM_41, \
+    .cmd = GPIO_NUM_40, \
+    .d0 = GPIO_NUM_42, \
+    .d1 = GPIO_NUM_NC, \
+    .d2 = GPIO_NUM_NC, \
+    .d3 = GPIO_NUM_NC, \
+    .d4 = GPIO_NUM_NC, \
+    .d5 = GPIO_NUM_NC, \
+    .d6 = GPIO_NUM_NC, \
+    .d7 = GPIO_NUM_NC, \
+    .cd = GPIO_NUM_NC, \
+    .wp = GPIO_NUM_NC, \
+    .width   = 1, \
+    .flags = 0, \
+}
