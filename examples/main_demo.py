@@ -48,8 +48,8 @@ def wifi_connect(epd, ssid, password):
     while not wlan.isconnected():
         time.sleep(0.2)
         count += 1
-        if count > 25:
-            break   # time out about 3s
+        if count > 35:
+            break   # time out about 7s
         pass
     
     if wlan.isconnected():
