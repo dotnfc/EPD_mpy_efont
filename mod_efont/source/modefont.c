@@ -37,6 +37,13 @@
 #include "modefont.h"
 #include "image_mpy.h"
 
+#if SOC_TEMP_SENSOR_SUPPORTED
+// take from
+// https://github.com/espressif/arduino-esp32/blob/master/cores/esp32/esp32-hal-misc.c#L67
+#include "driver/temperature_sensor.h"
+static temperature_sensor_handle_t temp_sensor = NULL;
+#endif
+
 #define EFONT_DMSG(...)   // mp_printf(&mp_plat_print, "[efm] " __VA_ARGS__)
 
 // class FT2(object):
@@ -55,6 +62,59 @@ typedef struct _mp_obj_FT2_t
 } mp_obj_FT2_t;
 
 STATIC const mp_obj_type_t mod_efont_FT2_type;
+
+#if SOC_TEMP_SENSOR_SUPPORTED
+static bool temperatureReadInit()
+{
+    static volatile bool initialized = false;
+    if(!initialized){
+        initialized = true;
+        //Install temperature sensor, expected temp ranger range: 10~50 ℃
+        temperature_sensor_config_t temp_sensor_config = TEMPERATURE_SENSOR_CONFIG_DEFAULT(10, 50);
+        if(temperature_sensor_install(&temp_sensor_config, &temp_sensor) != ESP_OK){
+            initialized = false;
+            temp_sensor = NULL;
+            mp_printf(&mp_plat_print, "temperature_sensor_install failed");
+        }
+        else if(temperature_sensor_enable(temp_sensor) != ESP_OK){
+            temperature_sensor_uninstall(temp_sensor);
+            initialized = false;
+            temp_sensor = NULL;
+            mp_printf(&mp_plat_print, "temperature_sensor_enable failed");
+        }
+
+        if(initialized){
+            float result = 0;
+            vTaskDelay(20 / portTICK_PERIOD_MS);
+            // for the first time, drop a dummy value
+            temperature_sensor_get_celsius(temp_sensor, &result);
+        }
+    }
+    return initialized;
+}
+
+float temperatureRead()
+{
+    float result = 0;
+    if(temperatureReadInit()){
+        if(temperature_sensor_get_celsius(temp_sensor, &result) != ESP_OK){
+            mp_printf(&mp_plat_print, "temperature_sensor_get_celsius failed\n");
+        }
+        else {
+            // mp_printf(&mp_plat_print, "temperature_sensor %f\n", result);
+        }
+    }
+    return result;
+}
+#endif // SOC_TEMP_SENSOR_SUPPORTED
+
+// def chipTemperature(self_in)
+//@brief get chip internal temperature
+STATIC mp_obj_t mod_efont_chipTemperature(void)
+{
+    return mp_obj_new_float((mp_float_t)temperatureRead());
+}
+STATIC MP_DEFINE_CONST_FUN_OBJ_0(mod_efont_chipTemperature_obj, mod_efont_chipTemperature);
 
 // def FT2.__init__(self_in, file: str, draw, size: int=16, mono: bool=False, bold: bool=False, italic: bool=False) -> bool
 //@brief Load font from file(.ttf, .pcf)
@@ -695,6 +755,7 @@ STATIC MP_DEFINE_CONST_FUN_OBJ_0(efont_package___init___obj, efont_package___ini
 STATIC const mp_rom_map_elem_t mp_module_efont_globals_table[] = {
     {MP_ROM_QSTR(MP_QSTR___name__),     MP_ROM_QSTR(MP_QSTR__efont)},
     {MP_ROM_QSTR(MP_QSTR___init__),     MP_ROM_PTR(&efont_package___init___obj) },
+    {MP_ROM_QSTR(MP_QSTR_chipTemperature), MP_ROM_PTR(&mod_efont_chipTemperature_obj)},
     {MP_ROM_QSTR(MP_QSTR_FT2),          MP_ROM_PTR(&mod_efont_FT2_type)},
     {MP_ROM_QSTR(MP_QSTR_Image),        MP_ROM_PTR(&mod_efont_Image_type)},
 
