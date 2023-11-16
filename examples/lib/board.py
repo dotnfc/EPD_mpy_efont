@@ -34,7 +34,7 @@ BATTERY_ADC  = Pin(1)
 BATTERY_ADC_EN= Pin(2)
 
 # temperature sensor
-SENSOR_EN   = Pin(40)
+SENSOR_EN   = Pin(40)  # -> IO5
 SENSOR_SCL  = Pin(39)
 SENSOR_SDA  = Pin(38)
 
@@ -44,3 +44,7 @@ NFC_TAG_IRQ = Pin(6)
 NFC_TAG_SCL = Pin(16)
 NFC_TAG_SDA = Pin(15)
 
+# sd mmc one data line
+SD_MMC_CLK = Pin(41)
+SD_MMC_CMD = Pin(40)
+SD_MMC_D0  = Pin(42)
