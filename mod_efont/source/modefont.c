@@ -106,6 +106,11 @@ float temperatureRead()
     }
     return result;
 }
+#else // !SOC_TEMP_SENSOR_SUPPORTED
+float temperatureRead()
+{
+    return 25.0f;
+}
 #endif // SOC_TEMP_SENSOR_SUPPORTED
 
 // def chipTemperature(self_in)
