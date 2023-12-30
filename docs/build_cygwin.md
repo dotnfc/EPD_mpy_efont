@@ -4,7 +4,7 @@
 ### 1.1 get cygwin and basic building components
   ```cmd
   > curl https://cygwin.com/setup-x86_64.exe --output setup.exe
-  : components to install: git, make, gcc-core, python3.9, wget
+  : components to install: git, make, gcc-core, python3.9, wget, autoconf, automake
   ```
 ### 1.2 get cygwin package manager
   ```
@@ -43,14 +43,14 @@ in cygwin shell(launch {CYGWIN}\Cygwin.bat)
   $ make -j4 MICROPY_STANDALONE=1
   ```
 
-  > MICROPY_STANDALONE to get libffi static linked
+  > MICROPY_STANDALONE=1 to get libffi static linked
 
   > the result is build-standard/micropython.exe
 
 if you want to build MPY_efont, just clone it, and build with the following command like
 
   ```shell
-  make USER_C_MODULES=../../../mod_efont/  DEBUG=1 -j4 CWARN="-Wno-error=unused-variable" FROZEN_MANIFEST=../../../mod_efont/unix_std_manifest.py
+  make USER_C_MODULES=../../../mod_efont/  MICROPY_STANDALONE=1 -j4 CWARN="-Wno-error=unused-variable" FROZEN_MANIFEST=../../../mod_efont/unix_std_manifest.py
   ```
 
 ### 2.3 run micropython standalone

@@ -82,7 +82,8 @@ mpy -X heapsize=8m page/uiDay.py
 - https://github.com/kikuchan/pngle [png 支持]
 - http://elm-chan.org/fsw/tjpgd/00index.html [jpg 支持]
 - https://github.com/russhughes/s3lcd [图形接口]
-
+- https://github.com/qwd/Icons [qWeather-Icons.ttf 来源]
+- Chinese Zodiac Signs Icons by StevyG
 
 <hr>
 

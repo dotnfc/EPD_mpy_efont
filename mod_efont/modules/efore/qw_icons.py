@@ -409,7 +409,7 @@ qw_icons = {
 }
 
 # api 天气图标[实心]
-qw_icons = {
+qw_icons_fill = {
     "100":"QW_100_FILL",
     "101":"QW_101_FILL",
     "102":"QW_102_FILL",
