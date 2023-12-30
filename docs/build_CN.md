@@ -66,7 +66,7 @@ $ . ~/esp/esp-idf/export.sh
 
 $ make USER_C_MODULES=../../../../mod_efont/source/micropython.cmake  DEBUG=1 -j4 CWARN="-Wno-error=unused-variable" BOARD_DIR=../../../mod_efont/boards/EFORE_S3
 
-$ cp -f build-EFORE_S3/firmware.bin /mnt/d/mpy-efore-s3.bin
+$ cp -f build-EFORE_S3/firmware.bin /mnt/d/mpy-efont-esp32s3_fw.bin
 ```
 
 在 WSL 中，下载固件
