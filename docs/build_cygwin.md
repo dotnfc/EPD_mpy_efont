@@ -50,7 +50,7 @@ in cygwin shell(launch {CYGWIN}\Cygwin.bat)
 if you want to build MPY_efont, just clone it, and build with the following command like
 
   ```shell
-  make USER_C_MODULES=../../../mod_efont/  MICROPY_STANDALONE=1 -j4 CWARN="-Wno-error=unused-variable" FROZEN_MANIFEST=../../../mod_efont/unix_std_manifest.py
+  make USER_C_MODULES=../../../mod_efont/cmodules MICROPY_STANDALONE=1 -j4 CWARN="-Wno-error=unused-variable" FROZEN_MANIFEST=../../../mod_efont/unix_std_manifest.py
   ```
 
 ### 2.3 run micropython standalone

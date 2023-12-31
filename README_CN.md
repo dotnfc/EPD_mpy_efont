@@ -83,8 +83,10 @@ mpy -X heapsize=8m page/uiDay.py
 - http://elm-chan.org/fsw/tjpgd/00index.html [jpg 支持]
 - https://github.com/russhughes/s3lcd [图形接口]
 - https://github.com/qwd/Icons [qWeather-Icons.ttf 来源]
+- https://github.com/coinkite/mpy-qr [qrcode]
+- https://github.com/jwygoda/mpy-qr [qrcode for mpy 1.20]
 - Chinese Zodiac Signs Icons by StevyG
 
 <hr>
 
-*2023/09/09*
+*2023/09/09* | *2023/12/31*

@@ -11,12 +11,14 @@ Once the environment has setup, you can compile as the followings:
 ```shell
 ~/mpy/EPD_mpy_efont$
 
-$ git clone --recursive https://github.com/dotnfc/EPD_mpy_efont
+$ git clone https://github.com/dotnfc/EPD_mpy_efont
+$ git submodules init
+$ git submodules update
 $ cd microropython
 $ make -C mpy-cross
 $ cd ports/unix
 $ make submodules
-$ make USER_C_MODULES=../../../mod_efont/  DEBUG=1 -j4 CWARN="-Wno-error=unused-variable" FROZEN_MANIFEST=../../../mod_efont/unix_std_manifest.py
+$ make USER_C_MODULES=../../../mod_efont/cmodules  DEBUG=1 -j4 CWARN="-Wno-error=unused-variable" FROZEN_MANIFEST=../../../mod_efont/unix_std_manifest.py
 ```
 
 ## 2. esp32 Port
@@ -31,14 +33,14 @@ build with
 ```shell
 ~/mpy/EPD_mpy_efont/micropython/ports/esp32$ 
 
-$ make USER_C_MODULES=../../../../mod_efont/source/micropython.cmake  DEBUG=1 -j4 CWARN="-Wno-error=unused-variable" BOARD_DIR=../../../mod_efont/boards/EFORE_S3
+$ make USER_C_MODULES=../../../../mod_efont/cmodules/micropython.cmake  DEBUG=1 -j4 CWARN="-Wno-error=unused-variable" BOARD_DIR=../../../mod_efont/boards/EFORE_S3
 
-$ cp -f build-EFORE_S3/firmware.bin /mnt/d/mpy-efore-s3.bin
+$ cp -f build-EFORE_S3/firmware.bin /mnt/d/mpy-efont-esp32s3_fw.bin
 ```
 
 On the Windows console, burn the output firmware file:
 ```ps
-> esptool  --before default_reset --after hard_reset --chip esp32s3 --baud 921600 --port com12 write_flash -z 0 d:\mpy-efore-s3.bin
+> esptool  --before default_reset --after hard_reset --chip esp32s3 --baud 921600 --port com12 write_flash -z 0 d:\mpy-efont-esp32s3_fw.bin
 ```
 
 ### NOTE !
