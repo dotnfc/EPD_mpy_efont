@@ -12,8 +12,8 @@ Once the environment has setup, you can compile as the followings:
 ~/mpy/EPD_mpy_efont$
 
 $ git clone https://github.com/dotnfc/EPD_mpy_efont
-$ git submodules init
-$ git submodules update
+$ git submodule init
+$ git submodule update
 $ cd microropython
 $ make -C mpy-cross
 $ cd ports/unix
