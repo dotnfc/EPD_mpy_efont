@@ -11,7 +11,7 @@ import ujson as json
 import requests
 from display import *
 from efont import *
-from qw_icons import *
+from efore.qw_icons import *
 
 try:
     import network
