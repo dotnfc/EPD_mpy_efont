@@ -6,12 +6,15 @@
 # by dotnfc, 2023/06/02
 #
 
-import time
+import time, uqr
 import ujson as json
-import urequests as requests
+try:
+    import urequests as requests
+except:
+    import requests
 from display import *
 from efont import *
-from qw_icons import *
+from efore.qw_icons import *
 
 try:
     import network
@@ -87,7 +90,12 @@ def delayStart(n):
         print(".", end="")
         time.sleep(1)
     print("")
-        
+
+def showQRCode(epd):
+    qr = uqr.make("Helloworld")
+    qr.draw(epd, 200, 100, 2, 0)
+    pass
+
 def main():
     ssid     = "DOTNFC-HOS"
     password = "20180903"
@@ -99,6 +107,8 @@ def main():
     epd.loadFont("simyou")
     epd.loadFont("icons")
     epd.selectFont("simyou")
+    
+    showQRCode(epd)
     if not wifi_connect(epd, ssid, password):
         showOffline(epd, ssid)
         epd.deepSleep(15000)

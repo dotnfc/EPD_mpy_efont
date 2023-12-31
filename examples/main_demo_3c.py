@@ -11,7 +11,7 @@ import ujson as json
 import urequests as requests
 from display3c import *
 from efont import *
-from qw_icons import *
+from efont.qw_icons import *
 
 try:
     import network
