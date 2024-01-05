@@ -18,7 +18,7 @@ $ cd microropython
 $ make -C mpy-cross
 $ cd ports/unix
 $ make submodules
-$ make USER_C_MODULES=../../../mod_efont/cmodules  DEBUG=1 -j4 CWARN="-Wno-error=unused-variable" FROZEN_MANIFEST=../../../mod_efont/unix_std_manifest.py
+$ make USER_C_MODULES=../../../mod_efont/cmodules VARIANT_DIR=../../../mod_efont/boards/unix-std  DEBUG=1 -j4 CWARN="-Wno-error=unused-variable"
 ```
 
 ## 2. esp32 平台的编译
