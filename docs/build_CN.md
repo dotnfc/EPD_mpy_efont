@@ -1,5 +1,18 @@
 # 构建 efont 扩展
 
+## 目录
+- [构建 efont 扩展](#构建-efont-扩展)
+  - [目录](#目录)
+  - [前言](#前言)
+  - [1. unix 平台的编译](#1-unix-平台的编译)
+  - [2. esp32 平台的编译](#2-esp32-平台的编译)
+    - [2.1 ESP-IDF 的安装](#21-esp-idf-的安装)
+    - [2.2 EFORE\_S3 编译](#22-efore_s3-编译)
+    - [注意 !](#注意-)
+  - [3. 开发中的提示](#3-开发中的提示)
+
+## 前言
+
 首先，我们需要搭建 micropython 的构建环境，以及 esp32-idf 的环境，请参考
 
 - [Micropython Getting Started](https://docs.micropython.org/en/latest/develop/gettingstarted.html#compile-and-build-the-code)

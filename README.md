@@ -1,5 +1,20 @@
 # Micropython Module eFont
 
+- [Micropython Module eFont](#micropython-module-efont)
+  - [1. Directory Structure](#1-directory-structure)
+  - [2. Module API](#2-module-api)
+  - [3. Font Conversion](#3-font-conversion)
+    - [3.1 TTF to Small Font](#31-ttf-to-small-font)
+    - [3.2 Compressed PCF Files](#32-compressed-pcf-files)
+  - [4. File System](#4-file-system)
+    - [4.1 Create a VFS image of the examples directory](#41-create-a-vfs-image-of-the-examples-directory)
+    - [4.2 Write the image](#42-write-the-image)
+    - [4.3 Test the VFS file system](#43-test-the-vfs-file-system)
+  - [5. Build efont](#5-build-efont)
+  - [6. How to test Script](#6-how-to-test-script)
+  - [7. Embedded Modules](#7-embedded-modules)
+  - [References](#references)
+
 [中文](README_CN.md) | English
 
 This module provides TTF, PCF bitmap font support, as well as JPG and PNG image display support for MicroPython (mpy).
@@ -74,6 +89,13 @@ And the unix port, its default heap size is too small for 3c 10.2' examples, we 
 mpy -X heapsize=8m page/uiDay.py
 ```
 
+## 7. Embedded Modules
+- [MicroDot](https://github.com/miguelgrinberg/microdot) 
+  
+  “The impossibly small web framework for Python and MicroPython”
+- [aioble](https://github.com/micropython/micropython-lib/tree/master/micropython/bluetooth/aioble)
+   
+  This library provides an object-oriented, asyncio-based wrapper for MicroPython's bluetooth API.
 
 ## References
 - https://github.com/takkaO/OpenFontRender [FT2 Wrapper Interface]

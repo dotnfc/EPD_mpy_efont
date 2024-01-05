@@ -1,5 +1,17 @@
 ## cygwin build Micropython unix port
 
+- [cygwin build Micropython unix port](#cygwin-build-micropython-unix-port)
+- [1. the build enviroment](#1-the-build-enviroment)
+  - [1.1 get cygwin and basic building components](#11-get-cygwin-and-basic-building-components)
+  - [1.2 get cygwin package manager](#12-get-cygwin-package-manager)
+  - [1.3 install library and other component](#13-install-library-and-other-component)
+  - [1.4 optional settings](#14-optional-settings)
+- [2 build micropython](#2-build-micropython)
+  - [2.1 get micropython and build mpy-cross](#21-get-micropython-and-build-mpy-cross)
+  - [2.2 build unix port](#22-build-unix-port)
+  - [2.3 run micropython standalone](#23-run-micropython-standalone)
+
+
 ## 1. the build enviroment
 ### 1.1 get cygwin and basic building components
   ```cmd
@@ -50,7 +62,12 @@ in cygwin shell(launch {CYGWIN}\Cygwin.bat)
 if you want to build MPY_efont, just clone it, and build with the following command like
 
   ```shell
-  make USER_C_MODULES=../../../mod_efont/cmodules MICROPY_STANDALONE=1 -j4 CWARN="-Wno-error=unused-variable" FROZEN_MANIFEST=../../../mod_efont/unix_std_manifest.py
+  $ cd micropython/ports/unix
+  $ make MICROPY_STANDALONE=1 submodules
+
+  $ make libffi VARIANT_DIR=../../../mod_efont/boards/unix-std
+
+  $ make USER_C_MODULES=../../../mod_efont/cmodules VARIANT_DIR=../../../mod_efont/boards/unix-std MICROPY_STANDALONE=1 -j4 CWARN="-Wno-error=unused-variable"
   ```
 
 ### 2.3 run micropython standalone

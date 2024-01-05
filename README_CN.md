@@ -2,6 +2,24 @@
 
 中文 | [English](README.md)
 
+## 索引
+- [Micropython 模块 eFont](#micropython-模块-efont)
+  - [索引](#索引)
+  - [1. 目录结构](#1-目录结构)
+  - [2. 模块的 API](#2-模块的-api)
+  - [3. 字体转换](#3-字体转换)
+    - [3.1 ttf 转小字库](#31-ttf-转小字库)
+    - [3.2 压缩的 pcf 文件](#32-压缩的-pcf-文件)
+  - [4. 文件系统](#4-文件系统)
+    - [4.1 创建 examples 目录的 vfs 镜像](#41-创建-examples-目录的-vfs-镜像)
+    - [4.2 写入镜像](#42-写入镜像)
+    - [4.3 测试 vfs 文件系统](#43-测试-vfs-文件系统)
+  - [5. 编译 efont](#5-编译-efont)
+  - [6. 如何运行脚本](#6-如何运行脚本)
+  - [7. 内置库](#7-内置库)
+  - [参考](#参考)
+
+
 此模块为 mpy 提供 TTF, PCF 点阵字体支持，以及 jpg, png 图片显示支持。
 
 ## 1. 目录结构
@@ -76,7 +94,14 @@ wget -O ~/.local/bin/mkfatfs https://github.com/labplus-cn/mkfatfs/releases/down
 mpy -X heapsize=8m page/uiDay.py
 ```
 
-
+## 7. 内置库
+- [MicroDot](https://github.com/miguelgrinberg/microdot) 
+  
+  “The impossibly small web framework for Python and MicroPython”
+- [aioble](https://github.com/micropython/micropython-lib/tree/master/micropython/bluetooth/aioble)
+   
+  This library provides an object-oriented, asyncio-based wrapper for MicroPython's bluetooth API.
+  
 ## 参考
 - https://github.com/takkaO/OpenFontRender [FT2 封装接口]
 - https://github.com/kikuchan/pngle [png 支持]
