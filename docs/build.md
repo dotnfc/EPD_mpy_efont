@@ -29,13 +29,22 @@ Setup ESP-IDF Once
 $ . ~/esp/esp-idf/export.sh
 ```
 
-build with
+build N8R2 firmware with
 ```shell
 ~/mpy/EPD_mpy_efont/micropython/ports/esp32$ 
 
 $ make USER_C_MODULES=../../../../mod_efont/cmodules/micropython.cmake  DEBUG=1 -j4 CWARN="-Wno-error=unused-variable" BOARD_DIR=../../../mod_efont/boards/EFORE_S3
 
 $ cp -f build-EFORE_S3/firmware.bin /mnt/d/mpy-efont-esp32s3_fw.bin
+```
+
+build N16R8 firmware with
+```shell
+~/mpy/EPD_mpy_efont/micropython/ports/esp32$ 
+
+$ make USER_C_MODULES=../../../../mod_efont/cmodules/micropython.cmake -j4 CWARN="-Wno-error=unused-variable" BOARD_DIR=../../../mod_efont/boards/EFORE_S3_N16R8
+
+$ cp -f build-EFORE_S3_N16R8/firmware.bin /mnt/d/mpy-efont-esp32s3_fw_ota.bin
 ```
 
 On the Windows console, burn the output firmware file:

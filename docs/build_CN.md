@@ -75,13 +75,22 @@ disable-pip-version-check = true
 $ . ~/esp/esp-idf/export.sh
 ```
 
-编译固件
+编译 N8R2 固件
 ```shell
 ~/mpy/EPD_mpy_efont/micropython/ports/esp32$ 
 
 $ make USER_C_MODULES=../../../../mod_efont/cmodules/micropython.cmake -j4 CWARN="-Wno-error=unused-variable" BOARD_DIR=../../../mod_efont/boards/EFORE_S3
 
 $ cp -f build-EFORE_S3/firmware.bin /mnt/d/mpy-efont-esp32s3_fw.bin
+```
+
+编译 N16R8 固件
+```shell
+~/mpy/EPD_mpy_efont/micropython/ports/esp32$ 
+
+$ make USER_C_MODULES=../../../../mod_efont/cmodules/micropython.cmake -j4 CWARN="-Wno-error=unused-variable" BOARD_DIR=../../../mod_efont/boards/EFORE_S3_N16R8
+
+$ cp -f build-EFORE_S3_N16R8/firmware.bin /mnt/d/mpy-efont-esp32s3_fw_ota.bin
 ```
 
 在 WSL 中，下载固件
